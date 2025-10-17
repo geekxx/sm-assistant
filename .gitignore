@@ -86,4 +86,4 @@ coverage.xml
 # Temporary files
 *.tmp
 *.temp
-.cache/
+.cache/foundation/

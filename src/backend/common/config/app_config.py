@@ -4,7 +4,7 @@ import os
 from typing import Optional
 
 from azure.ai.projects.aio import AIProjectClient
-from azure.cosmos import CosmosClient
+from azure.cosmos.cosmos_client import CosmosClient
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
 from dotenv import load_dotenv
 from semantic_kernel import Kernel
