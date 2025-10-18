@@ -9,6 +9,7 @@ from typing import List, Union
 from common.config.app_config import config
 from common.models.messages_kernel import TeamConfiguration
 from v3.magentic_agents.foundry_agent import FoundryAgentTemplate
+from v3.magentic_agents.sm_foundry_agent import SMFoundryAgent
 from v3.magentic_agents.models.agent_models import MCPConfig, SearchConfig
 
 # from v3.magentic_agents.models.agent_models import (BingConfig, MCPConfig,
@@ -39,14 +40,13 @@ class MagenticAgentFactory:
     #         data = json.load(f)
     #     return json.loads(json.dumps(data), object_hook=lambda d: SimpleNamespace(**d))
 
-    async def create_agent_from_config(self, user_id: str, agent_obj: SimpleNamespace) -> Union[FoundryAgentTemplate, ReasoningAgentTemplate, ProxyAgent]:
+    async def create_agent_from_config(self, user_id: str, agent_obj: SimpleNamespace) -> Union[FoundryAgentTemplate, ReasoningAgentTemplate, ProxyAgent, SMFoundryAgent]:
         """
         Create an agent from configuration object.
 
         Args:
             user_id: User ID
             agent_obj: Agent object from parsed JSON (SimpleNamespace)
-            team_model: Model name to determine which template to use
 
         Returns:
             Configured agent instance
@@ -55,13 +55,39 @@ class MagenticAgentFactory:
             UnsupportedModelError: If model is not supported
             InvalidConfigurationError: If configuration is invalid
         """
-        # Get model from agent config, team model, or environment
-        deployment_name = getattr(agent_obj, "deployment_name", None)
-
-        if not deployment_name and agent_obj.name.lower() == "proxyagent":
+        # Check for ProxyAgent first
+        if agent_obj.name.lower() == "proxyagent" or getattr(agent_obj, "type", "") == "proxy":
             self.logger.info("Creating ProxyAgent")
             return ProxyAgent(user_id=user_id)
+        
+        # Check for SM-Assistant agent type
+        if getattr(agent_obj, "type", "") == "sm_foundry":
+            self.logger.info(f"Creating SM-Assistant Foundry agent: {agent_obj.name}")
+            
+            # MCP config for SM agents
+            mcp_config = (
+                MCPConfig.from_env() if getattr(agent_obj, "use_mcp", False) else None
+            )
+            
+            agent = SMFoundryAgent(
+                agent_name=agent_obj.name,
+                agent_description=getattr(agent_obj, "description", ""),
+                agent_instructions=getattr(agent_obj, "system_message", ""),
+                model_deployment_name=getattr(agent_obj, "deployment_name", "gpt-4o"),
+                capability_type=getattr(agent_obj, "capability_type", "AgileCoaching"),
+                mcp_config=mcp_config,
+            )
+            
+            await agent.open()
+            self.logger.info(f"Successfully created SM-Assistant agent '{agent_obj.name}'")
+            return agent
 
+        # Get model from agent config
+        deployment_name = getattr(agent_obj, "deployment_name", None)
+
+        if not deployment_name:
+            deployment_name = "gpt-4o"  # Default model
+            
         # Validate supported models
         supported_models = json.loads(config.SUPPORTED_MODELS)
 

@@ -16,8 +16,14 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 # Import Azure AI components
-from azure.ai.projects.aio import AIProjectClient
-from azure.identity.aio import DefaultAzureCredential
+try:
+    from azure.ai.projects.aio import AIProjectClient
+    from azure.identity.aio import DefaultAzureCredential
+    AZURE_AVAILABLE = True
+except ImportError:
+    AZURE_AVAILABLE = False
+    AIProjectClient = None
+    DefaultAzureCredential = None
 import dotenv
 
 # Load environment variables
@@ -48,14 +54,24 @@ class AgentTestRequest(BaseModel):
     message: str
     agent_name: Optional[str] = None
 
-# Global client
+# Global client and connection state
 ai_client = None
+azure_connection_status = "not_attempted"
+azure_error_message = ""
 
-async def get_ai_client():
-    """Get or create Azure AI Project Client"""
-    global ai_client
-    if ai_client is None:
+async def get_ai_client_with_timeout(timeout_seconds: int = 10):
+    """Get or create Azure AI Project Client with timeout"""
+    global ai_client, azure_connection_status, azure_error_message
+    
+    if not AZURE_AVAILABLE:
+        azure_connection_status = "azure_sdk_not_available"
+        azure_error_message = "Azure AI SDK not installed"
+        return None
+    
+    if ai_client is None and azure_connection_status == "not_attempted":
         try:
+            azure_connection_status = "connecting"
+            
             # Load from environment
             subscription_id = os.getenv("AZURE_SUBSCRIPTION_ID")
             resource_group = os.getenv("AZURE_AI_RESOURCE_GROUP") 
@@ -69,42 +85,58 @@ async def get_ai_client():
             logger.info(f"  Project: {project_name}")
             
             if not all([subscription_id, resource_group, resource_name, project_name]):
-                logger.error(f"Missing Azure AI configuration")
-                raise ValueError("Missing Azure AI configuration - check .env file")
+                azure_connection_status = "configuration_missing"
+                azure_error_message = "Missing Azure AI configuration - check .env file"
+                logger.error(azure_error_message)
+                return None
             
-            # Try DefaultAzureCredential with more verbose logging
-            try:
+            # Try DefaultAzureCredential with timeout
+            async def create_client():
+                if not AZURE_AVAILABLE or DefaultAzureCredential is None or AIProjectClient is None:
+                    raise Exception("Azure AI SDK not available")
+                    
                 credential = DefaultAzureCredential()
-                # Use the correct Azure AI Foundry endpoint format from Bicep
                 endpoint = f"https://{resource_name}.services.ai.azure.com/api/projects/{project_name}"
                 
                 logger.info(f"Using endpoint: {endpoint}")
                 
-                ai_client = AIProjectClient(
+                client = AIProjectClient(
                     endpoint=endpoint,
                     credential=credential
                 )
                 
-                # Test the connection by trying to list agents
+                # Test the connection by trying to list agents with timeout
                 logger.info("Testing connection by listing agents...")
                 agent_count = 0
-                async for agent in ai_client.agents.list_agents():
+                async for agent in client.agents.list_agents():
                     agent_count += 1
                     logger.info(f"Found agent: {agent.name}")
-                    break
+                    break  # Just test that we can list at least one
                     
                 logger.info(f"✅ Connected to Azure AI Foundry successfully! Found {agent_count} agents")
-                return ai_client
+                return client
+            
+            # Apply timeout to the connection attempt
+            ai_client = await asyncio.wait_for(create_client(), timeout=timeout_seconds)
+            azure_connection_status = "connected"
+            return ai_client
                 
-            except Exception as cred_error:
-                logger.error(f"Azure AI Foundry connection failed: {cred_error}")
-                ai_client = None
-                
+        except asyncio.TimeoutError:
+            azure_connection_status = "timeout"
+            azure_error_message = f"Azure connection timed out after {timeout_seconds} seconds"
+            logger.error(azure_error_message)
+            ai_client = None
         except Exception as e:
-            logger.error(f"Failed to create AI client: {e}")
+            azure_connection_status = "error"
+            azure_error_message = str(e)
+            logger.error(f"Azure AI Foundry connection failed: {e}")
             ai_client = None
     
     return ai_client
+
+async def get_ai_client():
+    """Get AI client - legacy method for backward compatibility"""
+    return await get_ai_client_with_timeout(timeout_seconds=5)
 
 @app.get("/")
 async def root():
@@ -125,32 +157,90 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check with Azure AI Foundry connection test"""
+    """Health check with improved Azure AI Foundry connection handling"""
+    global azure_connection_status, azure_error_message
+    
     try:
-        client = await get_ai_client()
-        if not client:
-            return {
-                "status": "degraded",
-                "azure_ai_foundry": "authentication_failed",
-                "message": "Azure CLI not installed or not logged in",
-                "setup_instructions": [
-                    "Install Azure CLI: brew install azure-cli",
-                    "Login to Azure: az login",
-                    "Set subscription: az account set --subscription 79e8dd79-5215-4b8c-bb47-8cae706a99e7",
-                    "Restart the server"
-                ],
-                "timestamp": datetime.now().isoformat()
-            }
+        # Use timeout-enabled client connection
+        client = await get_ai_client_with_timeout(timeout_seconds=3)
         
-        # Test by listing agents
+        if not client:
+            # Provide detailed status based on connection attempt
+            if azure_connection_status == "azure_sdk_not_available":
+                return {
+                    "status": "degraded",
+                    "azure_ai_foundry": "sdk_not_available",
+                    "message": "Azure AI SDK not installed - running in fallback mode",
+                    "setup_instructions": [
+                        "Install Azure AI SDK: pip install azure-ai-projects",
+                        "Configure Azure environment variables",
+                        "Restart the server"
+                    ],
+                    "timestamp": datetime.now().isoformat()
+                }
+            elif azure_connection_status == "configuration_missing":
+                return {
+                    "status": "degraded",
+                    "azure_ai_foundry": "configuration_missing",
+                    "message": azure_error_message,
+                    "setup_instructions": [
+                        "Set AZURE_SUBSCRIPTION_ID environment variable",
+                        "Set AZURE_AI_RESOURCE_GROUP environment variable", 
+                        "Set AZURE_AI_PROJECT_NAME environment variable",
+                        "Restart the server"
+                    ],
+                    "timestamp": datetime.now().isoformat()
+                }
+            elif azure_connection_status == "timeout":
+                return {
+                    "status": "degraded",
+                    "azure_ai_foundry": "connection_timeout",
+                    "message": azure_error_message,
+                    "setup_instructions": [
+                        "Check Azure CLI authentication: az login",
+                        "Verify network connectivity to Azure",
+                        "Restart the server"
+                    ],
+                    "timestamp": datetime.now().isoformat()
+                }
+            else:
+                return {
+                    "status": "degraded",
+                    "azure_ai_foundry": "authentication_failed",
+                    "message": azure_error_message or "Azure authentication failed",
+                    "setup_instructions": [
+                        "Install Azure CLI: brew install azure-cli",
+                        "Login to Azure: az login",
+                        "Set subscription: az account set --subscription <your-subscription-id>",
+                        "Restart the server"
+                    ],
+                    "timestamp": datetime.now().isoformat()
+                }
+        
+        # Test by listing agents with timeout
         agent_count = 0
         agents_found = []
         try:
-            async for agent in client.agents.list_agents():
-                agent_count += 1
-                agents_found.append(agent.name)
-                if agent_count >= 3:  # Limit to first 3
-                    break
+            async def list_agents_test():
+                async for agent in client.agents.list_agents():
+                    nonlocal agent_count, agents_found
+                    agent_count += 1
+                    agents_found.append(agent.name)
+                    if agent_count >= 3:  # Limit to first 3
+                        break
+                return agent_count, agents_found
+            
+            # Apply timeout to agent listing
+            agent_count, agents_found = await asyncio.wait_for(list_agents_test(), timeout=5.0)
+            
+        except asyncio.TimeoutError:
+            logger.warning("Agent listing timed out")
+            return {
+                "status": "degraded", 
+                "azure_ai_foundry": "connected_but_timeout",
+                "message": "Connected to Azure but agent listing timed out",
+                "timestamp": datetime.now().isoformat()
+            }
         except Exception as e:
             logger.error(f"Agent list test failed: {e}")
             return {
@@ -217,22 +307,143 @@ async def list_agents():
 
 @app.post("/agents/chat")
 async def chat_with_agent(request: dict):
-    """Chat with a specific SM-Asst agent by name"""
+    """Chat with SM-Assistant using intelligent agent routing"""
     message = request.get("message", "").strip()
-    agent_name = request.get("agent_name", "").strip()
     
     if not message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
-    if not agent_name:
-        raise HTTPException(status_code=400, detail="Agent name must be specified")
     
-    # Route to test endpoint with agent specification
-    request_with_agent = {"message": message, "agent_name": agent_name}
+    # Simple intent detection for demo
+    message_lower = message.lower()
+    suggested_agent = None
+    
+    # Basic keyword routing (can be enhanced with SK orchestration later)
+    if any(word in message_lower for word in ["story", "stories", "backlog", "epic", "feature", "requirement", "acceptance criteria"]):
+        suggested_agent = "SM-Asst-BacklogIntelligence"
+    elif any(word in message_lower for word in ["meeting", "standup", "stand-up", "daily", "scrum", "retrospective", "planning"]):
+        suggested_agent = "SM-Asst-MeetingIntelligence"  
+    elif any(word in message_lower for word in ["metrics", "velocity", "burndown", "cycle time", "lead time", "flow", "bottleneck"]):
+        suggested_agent = "SM-Asst-FlowMetrics"
+    elif any(word in message_lower for word in ["wellness", "team", "mood", "sentiment", "burnout", "engagement", "happiness"]):
+        suggested_agent = "SM-Asst-TeamWellness"
+    elif any(word in message_lower for word in ["coaching", "agile", "process", "improvement", "guidance", "best practice"]):
+        suggested_agent = "SM-Asst-AgileCoaching"
+    
+    # Route to test endpoint with suggested agent
+    request_with_agent = {"message": message}
+    if suggested_agent:
+        request_with_agent["agent_name"] = suggested_agent
+        
     return await test_agent_interaction(request_with_agent)
+
+async def fallback_agent_response(message: str, requested_agent: Optional[str] = None):
+    """Provide intelligent fallback responses when Azure AI Foundry is unavailable"""
+    message_lower = message.lower()
+    
+    # Determine the best agent type based on message content
+    agent_type = "SM-Asst-AgileCoaching"  # Default
+    if any(word in message_lower for word in ["story", "stories", "backlog", "epic", "feature", "requirement", "acceptance criteria"]):
+        agent_type = "SM-Asst-BacklogIntelligence"
+    elif any(word in message_lower for word in ["meeting", "standup", "stand-up", "daily", "scrum", "retrospective", "planning"]):
+        agent_type = "SM-Asst-MeetingIntelligence"  
+    elif any(word in message_lower for word in ["metrics", "velocity", "burndown", "cycle time", "lead time", "flow", "bottleneck"]):
+        agent_type = "SM-Asst-FlowMetrics"
+    elif any(word in message_lower for word in ["wellness", "team", "mood", "sentiment", "burnout", "engagement", "happiness"]):
+        agent_type = "SM-Asst-TeamWellness"
+    
+    # Use requested agent if specified
+    if requested_agent:
+        agent_type = requested_agent
+    
+    # Generate contextual fallback responses
+    fallback_responses = {
+        "SM-Asst-BacklogIntelligence": f"""
+**📋 Backlog Intelligence Agent (Fallback Mode)**
+
+For your request: "{message}"
+
+Here's how I would typically help with backlog management:
+
+• **User Story Creation**: I can help structure user stories with proper acceptance criteria
+• **Epic Decomposition**: Break down large features into manageable stories  
+• **Backlog Prioritization**: Suggest priority frameworks (MoSCoW, Value vs Effort)
+• **Acceptance Criteria**: Define clear, testable conditions for story completion
+
+*Note: This is a fallback response. For full AI-powered assistance, Azure AI Foundry connection is needed.*
+        """,
+        "SM-Asst-MeetingIntelligence": f"""
+**🎙️ Meeting Intelligence Agent (Fallback Mode)**
+
+For your request: "{message}"
+
+Here's how I would typically help with meeting optimization:
+
+• **Standup Analysis**: Extract blockers, progress, and plans from daily standups
+• **Retrospective Facilitation**: Guide effective retros with proven techniques
+• **Meeting Minutes**: Generate action items and decisions from transcripts
+• **Ceremony Optimization**: Improve your scrum ceremonies based on best practices
+
+*Note: This is a fallback response. For full AI-powered assistance, Azure AI Foundry connection is needed.*
+        """,
+        "SM-Asst-FlowMetrics": f"""
+**📊 Flow Metrics Agent (Fallback Mode)**
+
+For your request: "{message}"
+
+Here's how I would typically help with flow analysis:
+
+• **Cycle Time Analysis**: Track story progression from start to done
+• **Lead Time Measurement**: Monitor customer request to delivery time
+• **Bottleneck Identification**: Pinpoint workflow constraints and delays
+• **Velocity Trends**: Analyze team delivery patterns and predictability
+
+*Note: This is a fallback response. For full AI-powered assistance, Azure AI Foundry connection is needed.*
+        """,
+        "SM-Asst-TeamWellness": f"""
+**💚 Team Wellness Agent (Fallback Mode)**
+
+For your request: "{message}"
+
+Here's how I would typically help with team wellness:
+
+• **Burnout Detection**: Monitor workload and stress indicators
+• **Sentiment Analysis**: Track team mood and engagement levels
+• **Work-Life Balance**: Suggest strategies for sustainable pace
+• **Team Health Metrics**: Measure collaboration and satisfaction
+
+*Note: This is a fallback response. For full AI-powered assistance, Azure AI Foundry connection is needed.*
+        """,
+        "SM-Asst-AgileCoaching": f"""
+**🎯 Agile Coaching Agent (Fallback Mode)**
+
+For your request: "{message}"
+
+Here's how I would typically provide agile coaching:
+
+• **Process Improvement**: Identify and implement workflow optimizations
+• **Best Practice Guidance**: Share proven agile methodologies and techniques
+• **Team Development**: Coach teams toward higher performance and autonomy
+• **Impediment Resolution**: Help remove organizational and technical blockers
+
+*Note: This is a fallback response. For full AI-powered assistance, Azure AI Foundry connection is needed.*
+        """
+    }
+    
+    response_text = fallback_responses.get(agent_type, fallback_responses["SM-Asst-AgileCoaching"])
+    
+    return {
+        "success": True,
+        "response": response_text.strip(),
+        "agent_name": f"{agent_type} (Fallback Mode)",
+        "run_status": "completed_fallback",
+        "fallback_mode": True,
+        "timestamp": datetime.now().isoformat(),
+        "message": "Azure AI Foundry connection unavailable - using intelligent fallback responses"
+    }
 
 @app.post("/agents/test")
 async def test_agent_interaction(request: dict):
-    """Test agent interaction with Azure AI Foundry"""
+    """Test agent interaction with Azure AI Foundry and fallback mode"""
     message = request.get("message", "").strip()
     agent_name = request.get("agent_name", "").strip()  # Optional specific agent
     logger.info(f"Received test request with message: {message[:100]}...")
@@ -244,37 +455,47 @@ async def test_agent_interaction(request: dict):
         raise HTTPException(status_code=400, detail="Message cannot be empty")
     
     try:
-        client = await get_ai_client()
+        client = await get_ai_client_with_timeout(timeout_seconds=5)
         if not client:
-            logger.error("Azure AI client not available")
-            raise HTTPException(status_code=500, detail="Azure AI Foundry connection failed")
+            logger.warning("Azure AI client not available - using fallback mode")
+            # Fallback mode - provide intelligent mock responses
+            return await fallback_agent_response(message, agent_name)
         
         # Get SM-Asst agent (specific one if requested, otherwise first available)
         target_agent = None
         all_agents = []
         sm_asst_agents = []
         
-        async for agent in client.agents.list_agents():
-            all_agents.append(agent.name)
-            if agent.name.startswith("SM-Asst-"):
-                sm_asst_agents.append(agent)
-                # If specific agent requested, match by name
-                if agent_name and agent.name == agent_name:
-                    target_agent = agent
-                    logger.info(f"Found requested agent: {agent.name} ({agent.id})")
-                    break
-                # If no specific agent requested, take first SM-Asst agent
-                elif not agent_name and not target_agent:
-                    target_agent = agent
-                    logger.info(f"Selected first SM-Asst agent: {agent.name} ({agent.id})")
+        try:
+            async def list_agents_with_timeout():
+                nonlocal target_agent, all_agents, sm_asst_agents
+                async for agent in client.agents.list_agents():
+                    all_agents.append(agent.name)
+                    if agent.name.startswith("SM-Asst-"):
+                        sm_asst_agents.append(agent)
+                        # If specific agent requested, match by name
+                        if agent_name and agent.name == agent_name:
+                            target_agent = agent
+                            logger.info(f"Found requested agent: {agent.name} ({agent.id})")
+                            break
+                        # If no specific agent requested, take first SM-Asst agent
+                        elif not agent_name and not target_agent:
+                            target_agent = agent
+                            logger.info(f"Selected first SM-Asst agent: {agent.name} ({agent.id})")
             
+            await asyncio.wait_for(list_agents_with_timeout(), timeout=5.0)
+            
+        except asyncio.TimeoutError:
+            logger.warning("Agent listing timed out - using fallback mode")
+            return await fallback_agent_response(message, agent_name)
+        
         if not target_agent:
             if agent_name:
                 logger.error(f"Requested agent '{agent_name}' not found. Available SM-Asst agents: {[a.name for a in sm_asst_agents]}")
-                raise HTTPException(status_code=404, detail=f"Agent '{agent_name}' not found")
+                return await fallback_agent_response(message, agent_name)
             else:
                 logger.error(f"No SM-Asst agents found. Available agents: {all_agents[:10]}")
-                raise HTTPException(status_code=404, detail="No SM-Asst agents available")
+                return await fallback_agent_response(message, agent_name)
         
         # Create thread
         thread = await client.agents.threads.create()
@@ -372,6 +593,19 @@ async def demo_page():
             textarea { width: 100%; height: 80px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
             .result { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 4px; border-left: 4px solid #0078d4; }
             pre { white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto; }
+            .chat-container { max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 4px; }
+            .chat-message { margin: 10px 0; padding: 10px; border-radius: 6px; }
+            .chat-message.user { background: #e3f2fd; text-align: right; }
+            .chat-message.assistant { background: #f1f8e9; }
+            .chat-message.system { background: #fff3e0; font-style: italic; }
+            .chat-input { display: flex; gap: 10px; align-items: flex-end; }
+            .chat-input textarea { flex: 1; height: 60px; resize: vertical; }
+            .chat-input button { height: 60px; }
+            .capability-tags { margin: 10px 0; }
+            .capability-tag { display: inline-block; background: #e3f2fd; padding: 4px 8px; margin: 2px; border-radius: 4px; font-size: 12px; }
+            .example-prompts { margin: 10px 0; }
+            .example-prompt { display: inline-block; background: #f5f5f5; padding: 6px 12px; margin: 3px; border-radius: 4px; cursor: pointer; font-size: 13px; border: 1px solid #ddd; }
+            .example-prompt:hover { background: #e0e0e0; }
         </style>
     </head>
     <body>
@@ -386,6 +620,42 @@ async def demo_page():
                 <h2>📋 Available Agents</h2>
                 <button onclick="loadAgents()">Refresh Agent List</button>
                 <div id="agents-list" class="agents-list">Loading...</div>
+            </div>
+            
+            <div class="card">
+                <h2>💬 General Chat with SM-Assistant</h2>
+                <p>Ask the SM-Assistant anything about agile, scrum, team management, or get help with specific tasks. The system will automatically route to the most appropriate specialized agent.</p>
+                
+                <div class="capability-tags">
+                    <div class="capability-tag">📋 Backlog & User Stories</div>
+                    <div class="capability-tag">🎙️ Meeting Analysis</div>
+                    <div class="capability-tag">📊 Flow Metrics</div>
+                    <div class="capability-tag">💚 Team Wellness</div>
+                    <div class="capability-tag">🎯 Agile Coaching</div>
+                </div>
+                
+                <div class="example-prompts">
+                    <strong>Example prompts:</strong><br>
+                    <span class="example-prompt" onclick="setChatMessage(this.textContent)">Create user stories for a new checkout feature</span>
+                    <span class="example-prompt" onclick="setChatMessage(this.textContent)">Analyze our team's velocity trends</span>
+                    <span class="example-prompt" onclick="setChatMessage(this.textContent)">Help improve our retrospective meetings</span>
+                    <span class="example-prompt" onclick="setChatMessage(this.textContent)">The team seems burned out, what should I do?</span>
+                    <span class="example-prompt" onclick="setChatMessage(this.textContent)">Extract action items from this meeting transcript</span>
+                    <span class="example-prompt" onclick="setChatMessage(this.textContent)">How can we reduce cycle time for our stories?</span>
+                </div>
+                
+                <div class="chat-container" id="chat-container">
+                    <div class="chat-message system">💡 Welcome! Ask me anything about agile processes, team management, or specific scrum master tasks. I'll route your question to the most appropriate specialist.</div>
+                </div>
+                
+                <div class="chat-input">
+                    <textarea id="chat-input" placeholder="Ask the SM-Assistant anything... (e.g., 'Help me improve our sprint planning' or 'Create acceptance criteria for user authentication')"></textarea>
+                    <button onclick="sendChatMessage()" id="chat-send-btn">Send</button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button onclick="clearChat()" style="background: #6c757d;">Clear Chat</button>
+                    <button onclick="loadChatExamples()" style="background: #28a745;">Load Examples</button>
+                </div>
             </div>
             
             <div class="card">
@@ -422,6 +692,7 @@ async def demo_page():
             window.onload = async function() {
                 await checkHealth();
                 await loadAgents();
+                loadChatExamples(); // Initialize chat example prompts
             };
             
             async function checkHealth() {
@@ -552,6 +823,149 @@ async def demo_page():
                 quickResult.style.display = 'block';
                 quickResult.innerHTML = testResult.innerHTML;
             }
+            
+            // Chat functionality
+            function setChatMessage(message) {
+                console.log('setChatMessage called with:', message);
+                const input = document.getElementById('chat-input');
+                console.log('Input element found:', input);
+                input.value = message;
+                console.log('Message set to input');
+            }
+            
+            async function sendChatMessage() {
+                console.log('sendChatMessage called');
+                const input = document.getElementById('chat-input');
+                const message = input.value.trim();
+                const sendBtn = document.getElementById('chat-send-btn');
+                const chatContainer = document.getElementById('chat-container');
+                
+                console.log('Message:', message);
+                console.log('Input element:', input);
+                console.log('Send button:', sendBtn);
+                console.log('Chat container:', chatContainer);
+                
+                if (!message) {
+                    alert('Please enter a message');
+                    return;
+                }
+                
+                // Disable send button
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'Sending...';
+                
+                // Add user message to chat
+                addChatMessage('user', message);
+                
+                // Clear input
+                input.value = '';
+                
+                // Add thinking message
+                const thinkingId = Date.now();
+                addChatMessage('system', '🤔 Analyzing your request and selecting the best agent...', thinkingId);
+                
+                try {
+                    const response = await fetch('/agents/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: message
+                            // Smart routing based on message content
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Remove thinking message
+                    removeChatMessage(thinkingId);
+                    
+                    if (data.success) {
+                        // Add agent identification
+                        addChatMessage('system', `🤖 ${data.agent_name} handled your request`);
+                        
+                        // Add agent response
+                        addChatMessage('assistant', data.response);
+                        
+                        // Add metadata
+                        const metadata = `✅ Response completed | Agent: ${data.agent_name} | Status: ${data.run_status || 'completed'}`;
+                        addChatMessage('system', metadata);
+                    } else {
+                        addChatMessage('system', `❌ Error: ${data.error || 'Unknown error occurred'}`);
+                    }
+                } catch (error) {
+                    removeChatMessage(thinkingId);
+                    addChatMessage('system', `❌ Request failed: ${error.message}`);
+                }
+                
+                // Re-enable send button
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send';
+            }
+            
+            function addChatMessage(type, content, id = null) {
+                console.log('addChatMessage called:', type, content, id);
+                const chatContainer = document.getElementById('chat-container');
+                console.log('Chat container found:', chatContainer);
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${type}`;
+                if (id) messageDiv.id = `msg-${id}`;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                const typeIcon = type === 'user' ? '👤' : type === 'assistant' ? '🤖' : '💡';
+                
+                messageDiv.innerHTML = `
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">
+                        ${typeIcon} ${type.charAt(0).toUpperCase() + type.slice(1)} - ${timestamp}
+                    </div>
+                    <div>${content}</div>
+                `;
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            function removeChatMessage(id) {
+                const messageElement = document.getElementById(`msg-${id}`);
+                if (messageElement) {
+                    messageElement.remove();
+                }
+            }
+            
+            function clearChat() {
+                const chatContainer = document.getElementById('chat-container');
+                chatContainer.innerHTML = '<div class="chat-message system">💡 Chat cleared. Ask me anything about agile processes or team management!</div>';
+            }
+            
+            function loadChatExamples() {
+                clearChat();
+                
+                const examples = [
+                    { type: 'user', content: 'Create user stories for a mobile app login feature' },
+                    { type: 'assistant', content: 'I\'ll help you create comprehensive user stories for mobile app login. Here\'s what I suggest:\n\n**Epic**: User Authentication System\n\n**User Story 1**: Basic Login\nAs a mobile app user, I want to log in with my email and password so that I can access my personalized content.\n\n**Acceptance Criteria**:\n- Given I am on the login screen\n- When I enter valid email and password\n- Then I should be redirected to the main dashboard\n- And my session should be maintained for 24 hours\n\n**Story Points**: 5\n**Dependencies**: User registration system, session management' },
+                    { type: 'user', content: 'How can we improve our sprint retrospectives?' },
+                    { type: 'assistant', content: 'Here are evidence-based strategies to enhance your retrospectives:\n\n**1. Vary the Format**\n- Try "Mad, Sad, Glad" instead of always using "Start, Stop, Continue"\n- Use "Sailboat" retrospective for identifying anchors (blockers) and wind (what\'s helping)\n\n**2. Focus on Actionable Items**\n- Limit action items to 2-3 maximum\n- Assign clear owners and deadlines\n- Follow up in the next retro\n\n**3. Create Psychological Safety**\n- Start with appreciations\n- Use anonymous feedback tools for sensitive topics\n- Ensure all voices are heard\n\n**4. Data-Driven Insights**\n- Review velocity trends and cycle time\n- Look at bug rates and technical debt\n\nWould you like me to suggest a specific retrospective format for your next meeting?' }
+                ];
+                
+                examples.forEach((example, index) => {
+                    setTimeout(() => {
+                        addChatMessage(example.type, example.content);
+                    }, index * 500);
+                });
+            }
+            
+            // Enable Enter key for chat
+            document.addEventListener('DOMContentLoaded', function() {
+                const chatInput = document.getElementById('chat-input');
+                if (chatInput) {
+                    chatInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendChatMessage();
+                        }
+                    });
+                }
+            });
         </script>
     </body>
     </html>
