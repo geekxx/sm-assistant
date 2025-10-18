@@ -258,8 +258,12 @@ async def test_agent_interaction(request: dict):
         while run.status in ["queued", "in_progress", "requires_action"] and wait_time < max_wait:
             await asyncio.sleep(2)
             wait_time += 2
-            run = await client.agents.runs.get(thread_id=thread.id, run_id=run.id)
-            logger.info(f"Run status: {run.status} (waited {wait_time}s)")
+            try:
+                run = await client.agents.runs.get(thread_id=thread.id, run_id=run.id)
+                logger.info(f"Run status: {run.status} (waited {wait_time}s)")
+            except Exception as poll_error:
+                logger.warning(f"Error polling run status: {poll_error}")
+                break
         
         result = {
             "success": False,
