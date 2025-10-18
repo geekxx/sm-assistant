@@ -180,25 +180,34 @@ async def health_check():
 
 @app.get("/agents/list")
 async def list_agents():
-    """List all Azure AI Foundry agents"""
+    """List available SM-Asst agents in Azure AI Foundry"""
     try:
         client = await get_ai_client()
         if not client:
-            raise HTTPException(status_code=503, detail="Azure AI Foundry not connected")
+            raise HTTPException(status_code=500, detail="Azure AI Foundry connection failed")
         
         agents = []
+        sm_asst_count = 0
+        total_count = 0
+        
         async for agent in client.agents.list_agents():
-            agents.append({
-                "id": agent.id,
-                "name": agent.name,
-                "description": getattr(agent, 'description', 'No description'),
-                "model": getattr(agent, 'model', 'Unknown'),
-                "created_at": getattr(agent, 'created_at', None)
-            })
+            total_count += 1
+            if agent.name.startswith("SM-Asst-"):
+                sm_asst_count += 1
+                agents.append({
+                    "id": agent.id,
+                    "name": agent.name,
+                    "description": getattr(agent, 'description', 'No description'),
+                    "created_at": getattr(agent, 'created_at', None),
+                    "model": getattr(agent, 'model', 'Unknown')
+                })
+        
+        logger.info(f"Found {sm_asst_count} SM-Asst agents out of {total_count} total agents")
         
         return {
             "agents": agents,
-            "count": len(agents),
+            "sm_asst_count": sm_asst_count,
+            "total_count": total_count,
             "timestamp": datetime.now().isoformat()
         }
         
@@ -206,11 +215,29 @@ async def list_agents():
         logger.error(f"Failed to list agents: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to list agents: {e}")
 
+@app.post("/agents/chat")
+async def chat_with_agent(request: dict):
+    """Chat with a specific SM-Asst agent by name"""
+    message = request.get("message", "").strip()
+    agent_name = request.get("agent_name", "").strip()
+    
+    if not message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+    if not agent_name:
+        raise HTTPException(status_code=400, detail="Agent name must be specified")
+    
+    # Route to test endpoint with agent specification
+    request_with_agent = {"message": message, "agent_name": agent_name}
+    return await test_agent_interaction(request_with_agent)
+
 @app.post("/agents/test")
 async def test_agent_interaction(request: dict):
     """Test agent interaction with Azure AI Foundry"""
     message = request.get("message", "").strip()
+    agent_name = request.get("agent_name", "").strip()  # Optional specific agent
     logger.info(f"Received test request with message: {message[:100]}...")
+    if agent_name:
+        logger.info(f"Requesting specific agent: {agent_name}")
     
     if not message:
         logger.warning("Empty message received in test request")
@@ -222,16 +249,32 @@ async def test_agent_interaction(request: dict):
             logger.error("Azure AI client not available")
             raise HTTPException(status_code=500, detail="Azure AI Foundry connection failed")
         
-        # Get first available agent
+        # Get SM-Asst agent (specific one if requested, otherwise first available)
         target_agent = None
+        all_agents = []
+        sm_asst_agents = []
+        
         async for agent in client.agents.list_agents():
-            target_agent = agent
-            logger.info(f"Selected agent: {agent.name} ({agent.id})")
-            break
+            all_agents.append(agent.name)
+            if agent.name.startswith("SM-Asst-"):
+                sm_asst_agents.append(agent)
+                # If specific agent requested, match by name
+                if agent_name and agent.name == agent_name:
+                    target_agent = agent
+                    logger.info(f"Found requested agent: {agent.name} ({agent.id})")
+                    break
+                # If no specific agent requested, take first SM-Asst agent
+                elif not agent_name and not target_agent:
+                    target_agent = agent
+                    logger.info(f"Selected first SM-Asst agent: {agent.name} ({agent.id})")
             
         if not target_agent:
-            logger.error("No agents found in Azure AI Foundry")
-            raise HTTPException(status_code=404, detail="No agents available")
+            if agent_name:
+                logger.error(f"Requested agent '{agent_name}' not found. Available SM-Asst agents: {[a.name for a in sm_asst_agents]}")
+                raise HTTPException(status_code=404, detail=f"Agent '{agent_name}' not found")
+            else:
+                logger.error(f"No SM-Asst agents found. Available agents: {all_agents[:10]}")
+                raise HTTPException(status_code=404, detail="No SM-Asst agents available")
         
         # Create thread
         thread = await client.agents.threads.create()

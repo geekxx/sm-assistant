@@ -51,9 +51,10 @@ async def debug_agents():
         print(f"🔗 Using endpoint: {endpoint}")
         print(f"📋 Listing agents...")
         
-        # List agents with detailed output
+        # List agents with detailed output, filtering for SM-Asst
         agent_count = 0
         all_agents = []
+        sm_asst_agents = []
         
         async for agent in client.agents.list_agents():
             agent_count += 1
@@ -67,26 +68,33 @@ async def debug_agents():
                 "all_attributes": [attr for attr in dir(agent) if not attr.startswith('_')]
             }
             all_agents.append(agent_data)
-            print(f"   Agent {agent_count}: {agent_data['name']} (ID: {agent_data['id']})")
+            
+            if agent_data['name'].startswith('SM-Asst-'):
+                sm_asst_agents.append(agent_data)
+                print(f"   ✅ SM-Asst Agent {len(sm_asst_agents)}: {agent_data['name']} (ID: {agent_data['id']})")
+            else:
+                print(f"   ⏭️  Other Agent {agent_count}: {agent_data['name']}")
         
         print(f"\n📊 Summary:")
         print(f"   Total agents found: {agent_count}")
+        print(f"   SM-Asst agents found: {len(sm_asst_agents)}")
+        print(f"   Other project agents: {agent_count - len(sm_asst_agents)}")
         
-        if all_agents:
-            print(f"\n📝 Detailed agent information:")
-            for agent in all_agents:
+        if sm_asst_agents:
+            print(f"\n🎯 SM-Asst Agents (Our Project):")
+            for agent in sm_asst_agents:
                 print(f"\n   Agent: {agent['name']}")
                 print(f"   ID: {agent['id']}")
                 print(f"   Model: {agent['model']}")
                 print(f"   Description: {agent['description']}")
                 print(f"   Instructions preview: {agent['instructions']}")
-                print(f"   Available attributes: {agent['all_attributes']}")
         else:
-            print(f"\n❌ No agents found. Possible reasons:")
-            print(f"   - Agents were created in a different project")
-            print(f"   - Agents are in draft state and not published")
-            print(f"   - API permissions don't include agent access")
-            print(f"   - Agents were created with different API version")
+            print(f"\n⚠️  No SM-Asst agents found!")
+            print(f"   Found agents from other projects:")
+            for agent in all_agents[:5]:  # Show first 5 other agents
+                print(f"   - {agent['name']}")
+            if len(all_agents) > 5:
+                print(f"   ... and {len(all_agents) - 5} more")
         
         # Also try to get project information
         print(f"\n🏢 Trying to get project information...")
