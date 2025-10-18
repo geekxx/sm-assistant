@@ -1,0 +1,19 @@
+# Enhanced requirements for AWS Lambda deployment
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+azure-ai-projects==1.2.0b5
+azure-identity==1.25.1
+semantic-kernel==1.37.0
+python-multipart==0.0.6
+python-dotenv==1.0.0
+httpx==0.25.2
+aiohttp==3.9.1
+requests==2.31.0
+
+# AWS Lambda specific
+mangum==0.17.0
+
+# For Semantic Kernel orchestration
+magentic==0.28.0
+openai==1.54.3

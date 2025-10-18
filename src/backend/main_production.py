@@ -11,9 +11,11 @@ import os
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBearer
 from pydantic import BaseModel
 import uvicorn
 
@@ -45,14 +47,30 @@ app = FastAPI(
     version="4.0.0"
 )
 
-# Configure CORS
+# Add security middleware for production
+app.add_middleware(
+    TrustedHostMiddleware, 
+    allowed_hosts=["*"]  # Configure with your domain in production
+)
+
+# Configure CORS for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Configure with your domains in production
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Security headers middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 # Pydantic models
 class AgentTestRequest(BaseModel):
@@ -165,9 +183,9 @@ async def fallback_agent_response(message: str, requested_agent: Optional[str] =
 
 Based on your request: "{message}"
 
-I'll help you with backlog management. Here's my analysis:
+I'll help you create user stories for your requirements. Here's my guidance:
 
-**For User Stories:**
+**For User Story Creation:**
 - Structure: "As a [user type], I want [functionality] so that [benefit]"
 - Include clear acceptance criteria with testable conditions
 - Consider edge cases and error scenarios
@@ -183,7 +201,14 @@ I'll help you with backlog management. Here's my analysis:
 - Collaborate with Product Owner on priority
 - Include Definition of Done criteria
 
-*This is an intelligent fallback response. For full AI-powered assistance with your specific context, please ensure Azure AI Foundry is configured.*
+**To get specific user stories for your domain:**
+Please connect to Azure AI Foundry to enable full BacklogIntelligenceAgent capabilities. The agent can then:
+- Generate detailed user stories for any application domain
+- Create appropriate acceptance criteria
+- Suggest story point estimates
+- Break down complex features into manageable stories
+
+*This is an intelligent fallback response. For full AI-powered user story generation for your specific requirements, please ensure Azure AI Foundry is configured.*
 """
     
     elif agent_type == "SM-Asst-MeetingIntelligence":

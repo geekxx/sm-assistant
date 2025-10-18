@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  sm-assistant:
+    build: .
+    ports:
+      - "8005:8005"
+    environment:
+      - AZURE_OPENAI_ENDPOINT=https://abricotnextgen1028338408.openai.azure.com/
+      - AZURE_OPENAI_API_VERSION=2024-06-01
+      - AZURE_AI_PROJECT_NAME=myArchitecture-Adele
+      - AZURE_RESOURCE_GROUP_NAME=abricot-AI
+      - AZURE_SUBSCRIPTION_ID=79e8dd79-5215-4b8c-bb47-8cae706a99e7
+      - HOST=0.0.0.0
+      - PORT=8005
+      - LOG_LEVEL=INFO
+    volumes:
+      - ~/.azure:/home/appuser/.azure:ro  # Mount Azure credentials
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
