@@ -9,6 +9,15 @@ This document describes the successful integration of Azure AI Foundry agents wi
 - **Added comprehensive logging**: Detailed logging throughout the agent interaction flow
 - **Enhanced error handling**: Robust timeout management and error recovery
 - **Verified real agent responses**: Successfully connected to Azure AI Foundry and received agent responses
+- **Added SM-Asst agent filtering**: Only interact with our project agents (5 out of 126 total)
+- **Implemented agent routing**: Select specific agents by name for targeted interactions
+
+### ✅ Available SM-Asst Agents
+- `SM-Asst-AgileCoachingAgent` - General agile coaching and strategic guidance
+- `SM-Asst-BacklogIntelligenceAgent` - User story creation and backlog analysis  
+- `SM-Asst-MeetingIntelligenceAgent` - Meeting transcription and action items
+- `SM-Asst-FlowMetricsAgent` - Delivery analytics and bottleneck identification
+- `SM-Asst-TeamWellnessAgent` - Sentiment analysis and wellness monitoring
 
 ### ✅ Key Files Created/Modified
 - `src/backend/main_simple_foundry.py` - Main FastAPI backend with Azure AI Foundry integration
@@ -18,9 +27,39 @@ This document describes the successful integration of Azure AI Foundry agents wi
 
 ### ✅ API Endpoints
 - `GET /health` - Health check endpoint
-- `GET /agents/list` - List available agents in Azure AI Foundry
-- `POST /agents/test` - Test agent interaction with message
+- `GET /agents/list` - List available SM-Asst agents (filters out other project agents)
+- `POST /agents/test` - Test agent interaction with optional agent selection
+- `POST /agents/chat` - Chat with specific agent by name
 - `GET /demo` - Interactive HTML demo page
+
+## Agent Filtering & Routing
+
+### SM-Asst Agent Discovery
+The system now filters the 126+ agents in Azure AI Foundry to focus only on our 5 SM-Asst agents:
+
+```json
+{
+  "agents": [...],
+  "sm_asst_count": 5,
+  "total_count": 126,
+  "timestamp": "2025-10-17T17:03:41.924374"
+}
+```
+
+### Agent Selection Options
+```bash
+# Use first available SM-Asst agent
+curl -X POST http://localhost:8003/agents/test \
+  -d '{"message": "Help with sprint planning"}'
+
+# Select specific agent
+curl -X POST http://localhost:8003/agents/test \
+  -d '{"message": "Analyze my backlog", "agent_name": "SM-Asst-BacklogIntelligenceAgent"}'
+
+# Chat endpoint for direct agent selection  
+curl -X POST http://localhost:8003/agents/chat \
+  -d '{"message": "Team wellness metrics?", "agent_name": "SM-Asst-TeamWellnessAgent"}'
+```
 
 ## API Corrections Made
 
