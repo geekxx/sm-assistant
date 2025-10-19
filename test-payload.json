@@ -1,1 +1,0 @@
-{"httpMethod": "POST", "path": "/query", "body": "{\"message\": \"test connection\"}"}
