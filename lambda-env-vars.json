@@ -1,0 +1,10 @@
+{
+  "Variables": {
+    "AZURE_RESOURCE_GROUP_NAME": "abricot-AI",
+    "AZURE_AI_PROJECT_CONNECTION_STRING": "https://abricotnextgen1028338408.openai.azure.com/;ResourceGroup=abricot-AI;SubscriptionId=79e8dd79-5215-4b8c-bb47-8cae706a99e7;ProjectName=myArchitecture-Adele",
+    "AZURE_TENANT_ID": "07ddac46-977d-4d8c-8b5f-e5a19a95ccbf",
+    "AZURE_CLIENT_SECRET": "sR_8Q~FgZQcwT8vqtYWgWr0gqvZ8LQjK4uv.Qb34",
+    "AZURE_CLIENT_ID": "8c4e2c6e-5a9e-4ce8-a821-f41e5d1d0b0d",
+    "TEST_VERSION": "v11-auth-priority-fix"
+  }
+}

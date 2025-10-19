@@ -94,8 +94,9 @@
             margin-bottom: 20px;
             padding: 15px;
             border-radius: 15px;
-            max-width: 80%;
+            max-width: 85%;
             word-wrap: break-word;
+            line-height: 1.5;
         }
 
         .message.user {
@@ -239,29 +240,39 @@
     </div>
 
     <script>
-        // Your deployed API URL
-        const API_BASE_URL = 'https://7jo7sc6ja4.execute-api.us-east-1.amazonaws.com/prod';
+        // Production API URL - using Lambda Function URL with real Azure AI Foundry integration
+        let API_BASE_URL = 'https://a726lepstwj765bemjarifp63q0aowzl.lambda-url.us-east-1.on.aws';
         
         let currentAgent = 'chat';
         let isConnected = false;
 
-        // Check connection status on load
+        // Check connection status on load - Lambda only
         async function checkConnection() {
             try {
+                console.log('Connecting to Azure AI Foundry Lambda...');
                 const response = await fetch(`${API_BASE_URL}/health`);
                 const data = await response.json();
+                
+                console.log('Lambda health response:', data);
                 
                 if (data.status === 'healthy') {
                     isConnected = true;
                     document.getElementById('status-indicator').className = 'status-indicator status-connected';
-                    addSystemMessage(`✅ Connected to SM Assistant (${data.agents.length} agents available)`);
+                    
+                    // Get agent count and Azure status
+                    const agentCount = data.total_sm_agents || data.agents_found || data.agents?.length || 0;
+                    const azureStatus = data.azure_ai_foundry || 'unknown';
+                    const mode = data.fallback_mode ? 'Fallback Mode' : 'Azure AI Foundry';
+                    
+                    addSystemMessage(`🚀 Connected to Lambda (${agentCount} agents - ${azureStatus} - ${mode})`);
                 } else {
-                    throw new Error('Service unhealthy');
+                    throw new Error(`Lambda unhealthy: ${data.message || 'Unknown error'}`);
                 }
             } catch (error) {
+                console.error('Lambda connection failed:', error);
                 isConnected = false;
                 document.getElementById('status-indicator').className = 'status-indicator status-disconnected';
-                addSystemMessage(`❌ Connection failed: ${error.message}`);
+                addSystemMessage(`❌ Lambda connection failed: ${error.message}`);
             }
         }
 
@@ -301,19 +312,25 @@
             document.getElementById('send-btn').disabled = true;
 
             try {
-                const endpoint = currentAgent === 'chat' ? '/agents/chat' : `/agents/${currentAgent}`;
-                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                // Always use /chat endpoint but specify the agent type
+                const response = await fetch(`${API_BASE_URL}/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ 
+                        message: message,
+                        agent: currentAgent  // Add agent parameter
+                    })
                 });
 
                 const data = await response.json();
                 
                 if (data.success) {
-                    addAssistantMessage(data.message, data.agent_name);
+                    // Use response field if available, otherwise message
+                    const responseText = data.response || data.message || 'No response';
+                    const agentName = data.agent_name || 'SM Assistant';
+                    addAssistantMessage(responseText, agentName);
                 } else {
                     addSystemMessage(`❌ Error: ${data.error || 'Unknown error'}`);
                 }
@@ -341,7 +358,32 @@
             const chatContainer = document.getElementById('chat-container');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message assistant';
-            messageDiv.innerHTML = `<strong>${agentName}:</strong><br>${message}`;
+            
+            // Convert markdown-like formatting to HTML
+            let formattedMessage = message
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold **text**
+                .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic *text*
+                .replace(/```([\s\S]*?)```/g, '<pre style="background:#f5f5f5;padding:10px;border-radius:5px;margin:10px 0;overflow-x:auto;"><code>$1</code></pre>') // Code blocks
+                .replace(/`([^`]+)`/g, '<code style="background:#f0f0f0;padding:2px 4px;border-radius:3px;">$1</code>') // Inline code
+                .replace(/^### (.*$)/gm, '<h3 style="margin:15px 0 10px 0;color:#4f46e5;">$1</h3>') // H3 headers
+                .replace(/^## (.*$)/gm, '<h2 style="margin:15px 0 10px 0;color:#4f46e5;">$1</h2>') // H2 headers
+                .replace(/^# (.*$)/gm, '<h1 style="margin:15px 0 10px 0;color:#4f46e5;">$1</h1>') // H1 headers
+                .replace(/^- (.*$)/gm, '<li style="margin:5px 0;">$1</li>') // List items
+                .replace(/^\d+\. (.*$)/gm, '<li style="margin:5px 0;">$1</li>') // Numbered list items
+                .replace(/\n\n/g, '</p><p style="margin:10px 0;">') // Paragraphs
+                .replace(/\n/g, '<br>'); // Line breaks
+            
+            // Wrap consecutive <li> elements in <ul>
+            formattedMessage = formattedMessage.replace(/(<li[^>]*>.*?<\/li>)(\s*<li[^>]*>.*?<\/li>)*/g, function(match) {
+                return '<ul style="margin:10px 0;padding-left:20px;">' + match + '</ul>';
+            });
+            
+            // Add paragraph wrapper if needed
+            if (!formattedMessage.includes('<h1>') && !formattedMessage.includes('<h2>') && !formattedMessage.includes('<h3>')) {
+                formattedMessage = '<p style="margin:10px 0;">' + formattedMessage + '</p>';
+            }
+            
+            messageDiv.innerHTML = `<strong style="color:#4f46e5;">${agentName}:</strong><br>${formattedMessage}`;
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
