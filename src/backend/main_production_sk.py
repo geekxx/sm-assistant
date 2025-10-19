@@ -201,6 +201,58 @@ async def load_sm_agents():
     except Exception as e:
         logger.error(f"❌ Failed to load SM agents: {e}")
 
+async def intelligent_agent_router(message: str) -> str:
+    """Use Semantic Kernel to intelligently route messages to the appropriate agent"""
+    
+    if not sk_enhanced or not semantic_kernel:
+        return "coaching"  # Default fallback
+    
+    try:
+        router_prompt = f"""You are an intelligent agent router for a Scrum Master Assistant system. 
+Analyze the user's message and determine which specialized agent should handle it.
+
+Available agents:
+- coaching: Agile practices, sprint planning, ceremonies, team leadership, process improvement
+- backlog: User stories, acceptance criteria, story estimation, epic breakdown, backlog management
+- meeting: Meeting analysis, action items, impediments, transcript analysis, meeting effectiveness
+- metrics: Velocity, cycle time, flow metrics, performance analysis, bottleneck identification
+- wellness: Team sentiment, burnout detection, team health, engagement monitoring
+
+User message: "{message}"
+
+Respond with ONLY the agent name (coaching, backlog, meeting, metrics, or wellness) that best matches this request."""
+
+        # Create simple routing function
+        prompt_config = PromptTemplateConfig(
+            template=router_prompt,
+            name="agent_router",
+            description="Routes messages to appropriate SM-Assistant agent"
+        )
+        
+        router_function = KernelFunctionFromPrompt(
+            function_name="agent_router",
+            prompt_template_config=prompt_config
+        )
+        
+        # Execute with short timeout
+        result = await asyncio.wait_for(
+            semantic_kernel.invoke(router_function),
+            timeout=5.0
+        )
+        
+        # Extract agent name from result
+        agent_choice = str(result).strip().lower()
+        valid_agents = ["coaching", "backlog", "meeting", "metrics", "wellness"]
+        
+        if agent_choice in valid_agents:
+            return agent_choice
+        else:
+            return "coaching"  # Default fallback
+            
+    except Exception as e:
+        logger.warning(f"Agent routing failed: {e}, defaulting to coaching")
+        return "coaching"
+
 async def enhanced_chat_with_sk(message: str, agent_name: str) -> Dict[str, Any]:
     """Enhanced chat using Semantic Kernel when available"""
     
@@ -398,8 +450,47 @@ async def chat_with_agent(request: ChatRequest):
         logger.error(f"Chat error: {e}")
         return {
             "success": False,
-            "agent_name": f"SM-Assistant-{agent_name.title()}",
+            "agent_name": f"SM-Assistant-{request.agent or 'coaching'}",
             "response": f"I encountered an error: {str(e)}",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
+
+@app.post("/agents/smart-chat")
+async def smart_chat_with_routing(request: ChatRequest):
+    """Smart chat that uses Semantic Kernel to route to the best agent"""
+    try:
+        # Use intelligent routing to determine the best agent
+        if sk_enhanced:
+            routed_agent = await intelligent_agent_router(request.message)
+            logger.info(f"Smart routing selected: {routed_agent} for message: {request.message[:50]}...")
+        else:
+            routed_agent = "coaching"  # Default fallback
+        
+        # Create new request with routed agent
+        routed_request = ChatRequest(
+            message=request.message,
+            agent=routed_agent,
+            team_id=request.team_id,
+            user_id=request.user_id
+        )
+        
+        # Process with the selected agent
+        result = await chat_with_agent(routed_request)
+        
+        # Add routing information to the response
+        if isinstance(result, dict):
+            result["routed_to"] = routed_agent
+            result["smart_routing"] = True
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Smart chat error: {e}")
+        return {
+            "success": False,
+            "agent_name": "SM-Assistant-Smart",
+            "response": f"I encountered an error during smart routing: {str(e)}",
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }
@@ -424,69 +515,160 @@ async def list_agents():
 
 @app.get("/demo")
 async def demo_ui():
-    """Simple demo UI"""
+    """Enhanced demo UI with smart routing"""
     return HTMLResponse(content="""
     <!DOCTYPE html>
     <html>
     <head>
         <title>SM-Assistant + Semantic Kernel Demo</title>
         <style>
-            body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
-            .agent-btn { margin: 5px; padding: 10px 20px; background: #007acc; color: white; border: none; border-radius: 5px; cursor: pointer; }
-            .agent-btn:hover { background: #005a9e; }
-            textarea { width: 100%; height: 100px; margin: 10px 0; }
-            .response { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; }
-            .status { color: #666; font-size: 0.9em; }
+            body { font-family: Arial, sans-serif; max-width: 900px; margin: 50px auto; padding: 20px; }
+            .mode-selector { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+            .mode-btn { margin: 5px; padding: 12px 24px; border: 2px solid #007acc; background: white; color: #007acc; border-radius: 6px; cursor: pointer; font-weight: bold; }
+            .mode-btn.active { background: #007acc; color: white; }
+            .agent-section { display: none; background: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+            .agent-section.show { display: block; }
+            .agent-btn { margin: 5px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+            .agent-btn:hover { background: #218838; }
+            .agent-btn.selected { background: #17a2b8; }
+            textarea { width: 100%; height: 120px; margin: 10px 0; border: 2px solid #ddd; border-radius: 5px; padding: 10px; font-family: inherit; }
+            .send-btn { padding: 12px 30px; background: #007acc; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
+            .send-btn:hover { background: #005a9e; }
+            .response { background: #f5f5f5; padding: 20px; margin: 15px 0; border-radius: 8px; white-space: pre-wrap; border-left: 4px solid #007acc; }
+            .status { color: #666; font-size: 0.9em; font-style: italic; }
+            .smart-indicator { background: linear-gradient(45deg, #007acc, #28a745); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.8em; display: inline-block; margin-left: 10px; }
+            .example-prompts { background: #fffbf0; border: 1px solid #ffd700; border-radius: 8px; padding: 15px; margin: 15px 0; }
+            .example-prompts h4 { margin-top: 0; color: #e68900; }
+            .example-prompt { background: white; padding: 8px 12px; margin: 5px 0; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; font-size: 0.9em; }
+            .example-prompt:hover { background: #f8f9fa; border-color: #007acc; }
         </style>
     </head>
     <body>
-        <h1>🤖 SM-Assistant + Semantic Kernel Demo</h1>
-        <div class="status">Status: Enhanced with Semantic Kernel orchestration</div>
+        <h1>🤖 SM-Assistant + Semantic Kernel</h1>
+        <div class="status">Enhanced with intelligent agent routing and Semantic Kernel orchestration</div>
         
-        <h3>Select Agent:</h3>
-        <button class="agent-btn" onclick="setAgent('coaching')">🎯 Coaching</button>
-        <button class="agent-btn" onclick="setAgent('backlog')">📋 Backlog</button>
-        <button class="agent-btn" onclick="setAgent('meeting')">🎤 Meeting</button>
-        <button class="agent-btn" onclick="setAgent('metrics')">📊 Metrics</button>
-        <button class="agent-btn" onclick="setAgent('wellness')">💚 Wellness</button>
+        <div class="mode-selector">
+            <h3>🎯 Select Interaction Mode:</h3>
+            <button class="mode-btn active" onclick="setMode('smart')">🧠 Smart Mode (AI Routes Automatically)</button>
+            <button class="mode-btn" onclick="setMode('manual')">🎛️ Manual Mode (Choose Agent)</button>
+        </div>
+        
+        <div class="agent-section" id="manual-agents">
+            <h3>Select Specific Agent:</h3>
+            <button class="agent-btn" onclick="setAgent('coaching')">🎯 Coaching</button>
+            <button class="agent-btn" onclick="setAgent('backlog')">📋 Backlog</button>
+            <button class="agent-btn" onclick="setAgent('meeting')">🎤 Meeting</button>
+            <button class="agent-btn" onclick="setAgent('metrics')">📊 Metrics</button>
+            <button class="agent-btn" onclick="setAgent('wellness')">💚 Wellness</button>
+        </div>
+        
+        <div class="example-prompts">
+            <h4>💡 Try these example prompts:</h4>
+            <div class="example-prompt" onclick="setMessage(this.textContent)">Help me write user stories for a login feature</div>
+            <div class="example-prompt" onclick="setMessage(this.textContent)">Our team velocity has been declining, what should we do?</div>
+            <div class="example-prompt" onclick="setMessage(this.textContent)">Analyze this standup: Yesterday we fixed bugs, today we're testing, no blockers</div>
+            <div class="example-prompt" onclick="setMessage(this.textContent)">My team seems stressed and burnout is high, what can I do?</div>
+            <div class="example-prompt" onclick="setMessage(this.textContent)">What are the best practices for sprint retrospectives?</div>
+        </div>
         
         <h3>Your Message:</h3>
-        <textarea id="message" placeholder="Ask me anything about agile practices, user stories, team metrics, or meeting analysis..."></textarea>
+        <textarea id="message" placeholder="Ask me anything about agile practices, user stories, team metrics, meeting analysis, or team wellness. In Smart Mode, I'll automatically route your question to the most appropriate specialist!"></textarea>
         <br>
-        <button onclick="sendMessage()" style="padding: 10px 30px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Send Message</button>
+        <button class="send-btn" onclick="sendMessage()">Send Message</button>
         
         <h3>Response:</h3>
-        <div id="response" class="response">Ready to help! Select an agent and ask your question.</div>
+        <div id="response" class="response">Ready to help! Try Smart Mode for automatic agent routing, or use Manual Mode to choose a specific agent. Ask your question and I'll provide expert guidance!</div>
         
         <script>
+            let currentMode = 'smart';
             let currentAgent = 'coaching';
+            
+            function setMode(mode) {
+                currentMode = mode;
+                
+                // Update button states
+                document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+                
+                // Show/hide manual agent selection
+                const agentSection = document.getElementById('manual-agents');
+                if (mode === 'manual') {
+                    agentSection.classList.add('show');
+                } else {
+                    agentSection.classList.remove('show');
+                }
+                
+                // Update status
+                const statusText = mode === 'smart' ? 
+                    'Smart Mode: AI will automatically route to the best agent' : 
+                    `Manual Mode: ${currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1)} agent selected`;
+                document.querySelector('.status').innerHTML = statusText + 
+                    (mode === 'smart' ? '<span class="smart-indicator">🧠 AI Routing Active</span>' : '');
+            }
             
             function setAgent(agent) {
                 currentAgent = agent;
-                document.querySelector('.status').textContent = `Status: ${agent.charAt(0).toUpperCase() + agent.slice(1)} agent selected`;
+                
+                // Update button states
+                document.querySelectorAll('.agent-btn').forEach(btn => btn.classList.remove('selected'));
+                event.target.classList.add('selected');
+                
+                // Update status
+                document.querySelector('.status').textContent = `Manual Mode: ${agent.charAt(0).toUpperCase() + agent.slice(1)} agent selected`;
+            }
+            
+            function setMessage(text) {
+                document.getElementById('message').value = text;
             }
             
             async function sendMessage() {
                 const message = document.getElementById('message').value;
                 if (!message) return;
                 
-                document.getElementById('response').textContent = 'Processing...';
+                const responseDiv = document.getElementById('response');
+                responseDiv.textContent = currentMode === 'smart' ? 
+                    'Processing... 🧠 AI is determining the best agent for your request...' : 
+                    'Processing...';
                 
                 try {
-                    const response = await fetch('/agents/chat', {
+                    const endpoint = currentMode === 'smart' ? '/agents/smart-chat' : '/agents/chat';
+                    const payload = currentMode === 'smart' ? 
+                        {message: message} : 
+                        {message: message, agent: currentAgent};
+                    
+                    const response = await fetch(endpoint, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({message: message, agent: currentAgent})
+                        body: JSON.stringify(payload)
                     });
                     
                     const result = await response.json();
-                    const enhancementNote = result.semantic_kernel_enhanced ? ' (Semantic Kernel Enhanced)' : result.azure_ai_foundry ? ' (Azure AI Foundry)' : ' (Fallback Mode)';
-                    document.getElementById('response').textContent = 
-                        `Agent: ${result.agent_name}${enhancementNote}\\n\\n${result.response}`;
+                    
+                    // Format response with routing info
+                    let responseText = `Agent: ${result.agent_name}`;
+                    
+                    if (result.smart_routing && result.routed_to) {
+                        responseText += ` (🧠 Auto-routed to ${result.routed_to})`;
+                    }
+                    
+                    if (result.semantic_kernel_enhanced) {
+                        responseText += ' (Semantic Kernel Enhanced)';
+                    } else if (result.azure_ai_foundry) {
+                        responseText += ' (Azure AI Foundry)';
+                    } else {
+                        responseText += ' (Fallback Mode)';
+                    }
+                    
+                    responseText += `\\n\\n${result.response}`;
+                    responseDiv.textContent = responseText;
+                    
                 } catch (error) {
-                    document.getElementById('response').textContent = `Error: ${error.message}`;
+                    responseDiv.textContent = `Error: ${error.message}`;
                 }
             }
+            
+            // Initialize in smart mode
+            setMode('smart');
         </script>
     </body>
     </html>
