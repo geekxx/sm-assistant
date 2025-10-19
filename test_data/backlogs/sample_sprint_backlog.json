@@ -1,0 +1,91 @@
+{
+  "sprint": {
+    "name": "Sprint 15",
+    "start_date": "2024-01-15",
+    "end_date": "2024-01-29",
+    "goal": "Complete user authentication and basic dashboard functionality"
+  },
+  "stories": [
+    {
+      "id": "US-101",
+      "title": "User Login with OAuth",
+      "description": "As a user, I want to log in using my company credentials so that I can access the application securely",
+      "status": "In Progress",
+      "story_points": 8,
+      "priority": "High",
+      "assignee": "Jane Smith",
+      "acceptance_criteria": [
+        "User can click login button",
+        "OAuth flow redirects to company SSO",
+        "Successful login creates user session",
+        "Failed login shows appropriate error message"
+      ],
+      "blockers": [],
+      "created_date": "2024-01-10"
+    },
+    {
+      "id": "US-102", 
+      "title": "Dashboard Widget Framework",
+      "description": "As a user, I want to see customizable dashboard widgets so that I can monitor key metrics at a glance",
+      "status": "To Do",
+      "story_points": 13,
+      "priority": "Medium",
+      "assignee": "Bob Johnson",
+      "acceptance_criteria": [
+        "Widget container system is implemented",
+        "Users can add/remove widgets",
+        "Widget positions can be saved",
+        "Responsive design works on mobile"
+      ],
+      "blockers": [],
+      "created_date": "2024-01-12"
+    },
+    {
+      "id": "US-103",
+      "title": "Password Reset Flow",
+      "description": "As a user, I want to reset my password if I forget it so that I can regain access to my account",
+      "status": "Done",
+      "story_points": 5,
+      "priority": "Medium", 
+      "assignee": "Alice Chen",
+      "acceptance_criteria": [
+        "User can request password reset via email",
+        "Reset email contains secure token",
+        "Token expires after 24 hours",
+        "New password meets security requirements"
+      ],
+      "blockers": [],
+      "created_date": "2024-01-08",
+      "completed_date": "2024-01-18"
+    },
+    {
+      "id": "US-104",
+      "title": "API Rate Limiting",
+      "description": "As a system administrator, I want API endpoints to have rate limiting so that the system remains stable under heavy load",
+      "status": "Blocked",
+      "story_points": 8,
+      "priority": "High",
+      "assignee": "Mike Davis",
+      "acceptance_criteria": [
+        "Rate limits are configurable per endpoint",
+        "Appropriate HTTP status codes returned",
+        "Rate limit headers included in responses",
+        "Different limits for authenticated vs anonymous users"
+      ],
+      "blockers": [
+        "Waiting for infrastructure team to provision Redis cluster"
+      ],
+      "created_date": "2024-01-14"
+    }
+  ],
+  "team_capacity": {
+    "total_points": 34,
+    "committed_points": 21,
+    "completed_points": 5
+  },
+  "backlog_health": {
+    "ready_stories": 12,
+    "stories_needing_refinement": 8,
+    "epics_without_stories": 2
+  }
+}

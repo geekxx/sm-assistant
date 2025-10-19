@@ -1,0 +1,65 @@
+{
+  "story_id": "US-105",
+  "title": "Two-Factor Authentication Setup",
+  "epic": "User Security Enhancement",
+  "description": "As a security-conscious user, I want to enable two-factor authentication on my account so that my data is protected even if my password is compromised",
+  "user_persona": "Security-conscious business user",
+  "business_value": "Reduces risk of account compromise and meets compliance requirements",
+  "story_points": 8,
+  "priority": "High",
+  "labels": ["security", "authentication", "compliance"],
+  "acceptance_criteria": [
+    {
+      "scenario": "Enable 2FA with authenticator app",
+      "given": "I am logged into my account settings",
+      "when": "I select 'Enable Two-Factor Authentication'",
+      "then": "I see a QR code to scan with my authenticator app"
+    },
+    {
+      "scenario": "Verify 2FA setup",
+      "given": "I have scanned the QR code with my authenticator app",
+      "when": "I enter the 6-digit code from my authenticator",
+      "then": "My 2FA is successfully enabled and I see backup codes"
+    },
+    {
+      "scenario": "Login with 2FA enabled",
+      "given": "I have 2FA enabled on my account",
+      "when": "I log in with my username and password",
+      "then": "I am prompted to enter my 2FA code before gaining access"
+    },
+    {
+      "scenario": "Backup code usage",
+      "given": "I don't have access to my authenticator app",
+      "when": "I use one of my backup codes during login",
+      "then": "I can successfully log in and the backup code is marked as used"
+    },
+    {
+      "scenario": "Disable 2FA",
+      "given": "I have 2FA enabled and want to disable it",
+      "when": "I go to security settings and select 'Disable 2FA'",
+      "then": "I am prompted to enter my current 2FA code to confirm disable"
+    }
+  ],
+  "definition_of_done": [
+    "Code is peer reviewed",
+    "Unit tests written and passing", 
+    "Integration tests passing",
+    "Security audit completed",
+    "Documentation updated",
+    "QA testing completed",
+    "Accessibility compliance verified"
+  ],
+  "dependencies": [
+    "US-101 (User Login with OAuth) must be completed"
+  ],
+  "risks": [
+    "Users may lose access if they lose their authenticator device",
+    "Support overhead for locked-out users"
+  ],
+  "technical_notes": [
+    "Use TOTP (Time-based One-Time Password) standard",
+    "Generate 10 single-use backup codes",
+    "Store 2FA secrets encrypted in database",
+    "Consider rate limiting for 2FA attempts"
+  ]
+}

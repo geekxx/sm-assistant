@@ -1,0 +1,110 @@
+{
+  "sprint_metrics": {
+    "sprint_number": 15,
+    "date_range": "2024-01-15 to 2024-01-29",
+    "team_size": 5,
+    "working_days": 10
+  },
+  "velocity_data": {
+    "committed_points": 34,
+    "completed_points": 21,
+    "completion_percentage": 61.8,
+    "previous_sprint_velocity": 28,
+    "velocity_trend": "declining"
+  },
+  "cycle_time_metrics": {
+    "average_cycle_time_days": 4.2,
+    "stories_by_cycle_time": [
+      {
+        "story_id": "US-103",
+        "cycle_time_days": 3.1,
+        "status": "completed"
+      },
+      {
+        "story_id": "US-101", 
+        "cycle_time_days": 5.8,
+        "status": "in_progress"
+      },
+      {
+        "story_id": "US-102",
+        "cycle_time_days": 2.1,
+        "status": "in_progress"
+      }
+    ]
+  },
+  "lead_time_metrics": {
+    "average_lead_time_days": 12.5,
+    "breakdown": {
+      "backlog_to_ready": 6.2,
+      "ready_to_in_progress": 1.8,
+      "in_progress_to_done": 4.5
+    }
+  },
+  "flow_efficiency": {
+    "active_time_percentage": 35.6,
+    "wait_time_percentage": 64.4,
+    "bottlenecks": [
+      {
+        "stage": "Code Review",
+        "avg_wait_time_days": 2.3,
+        "impact": "high"
+      },
+      {
+        "stage": "QA Testing",
+        "avg_wait_time_days": 1.8,
+        "impact": "medium"
+      },
+      {
+        "stage": "External Dependencies",
+        "avg_wait_time_days": 3.1,
+        "impact": "high"
+      }
+    ]
+  },
+  "defect_metrics": {
+    "bugs_found_in_sprint": 3,
+    "bugs_fixed_in_sprint": 5,
+    "bug_escape_rate": 8.2,
+    "defect_removal_efficiency": 91.8
+  },
+  "impediments": [
+    {
+      "id": "IMP-001",
+      "description": "Redis cluster provisioning delay",
+      "days_open": 4,
+      "impact": "1 story blocked",
+      "owner": "Infrastructure Team"
+    },
+    {
+      "id": "IMP-002", 
+      "description": "Mobile CSS framework compatibility",
+      "days_open": 1,
+      "impact": "Development delay",
+      "owner": "Development Team",
+      "status": "resolved"
+    }
+  ],
+  "team_capacity": {
+    "planned_capacity_hours": 320,
+    "actual_capacity_hours": 295,
+    "capacity_utilization": 92.2,
+    "unplanned_work_percentage": 15.3
+  },
+  "retrospective_insights": {
+    "what_went_well": [
+      "Strong team collaboration and pairing",
+      "Quick resolution of technical blockers",
+      "Good communication about impediments"
+    ],
+    "what_needs_improvement": [
+      "External dependency management",
+      "Story estimation accuracy",
+      "Code review cycle time"
+    ],
+    "action_items": [
+      "Implement stricter SLAs with infrastructure team",
+      "Refine estimation process with historical data",
+      "Set up automated reminders for code reviews"
+    ]
+  }
+}

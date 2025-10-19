@@ -24,6 +24,9 @@ from azure.identity.aio import DefaultAzureCredential
 # Add backend path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Import orchestration components
+from v3.orchestration.orchestration_manager import OrchestrationManager
+
 # Load environment
 dotenv.load_dotenv()
 
