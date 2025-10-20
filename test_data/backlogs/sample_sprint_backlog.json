@@ -76,16 +76,106 @@
         "Waiting for infrastructure team to provision Redis cluster"
       ],
       "created_date": "2024-01-14"
+    },
+    {
+      "id": "US-105",
+      "title": "User Profile Management",
+      "description": "As a user, I want to update my profile information so that my account details are current",
+      "status": "In Progress",
+      "story_points": null,
+      "priority": "Medium",
+      "assignee": "Alice Chen",
+      "acceptance_criteria": [
+        "User can edit name, email, and phone number",
+        "Profile picture upload functionality",
+        "Changes are validated before saving"
+      ],
+      "blockers": [],
+      "created_date": "2024-01-16"
+    },
+    {
+      "id": "US-106",
+      "title": "Email Notification System",
+      "description": "As a user, I want to receive email notifications for important events so that I stay informed",
+      "status": "To Do",
+      "story_points": 5,
+      "priority": "Low",
+      "assignee": "Sarah Wilson",
+      "acceptance_criteria": [],
+      "blockers": [],
+      "created_date": "2024-01-17"
+    },
+    {
+      "id": "US-107",
+      "title": "Dark Mode Theme",
+      "description": "As a user, I want a dark mode option so that I can use the app comfortably in low-light environments",
+      "status": "To Do",
+      "story_points": 3,
+      "priority": "Low",
+      "assignee": "Bob Johnson",
+      "acceptance_criteria": [
+        "Toggle switch in user preferences",
+        "All UI components support dark theme",
+        "User preference is persisted",
+        "Default theme respects system settings"
+      ],
+      "blockers": [],
+      "created_date": "2024-01-18"
+    },
+    {
+      "id": "US-108",
+      "title": "Advanced Search Functionality",
+      "description": "As a user, I want to search through my data with filters so that I can quickly find what I need",
+      "status": "To Do",
+      "story_points": null,
+      "priority": "Medium",
+      "assignee": "Jane Smith",
+      "acceptance_criteria": [],
+      "blockers": [],
+      "created_date": "2024-01-19"
+    },
+    {
+      "id": "US-109",
+      "title": "Export Data Feature",
+      "description": "As a user, I want to export my data in different formats so that I can use it in other tools",
+      "status": "To Do",
+      "story_points": 8,
+      "priority": "Medium",
+      "assignee": "Mike Davis",
+      "acceptance_criteria": [
+        "Support CSV, PDF, and JSON export formats",
+        "Export includes user-selected date ranges",
+        "Large exports are processed asynchronously"
+      ],
+      "blockers": [],
+      "created_date": "2024-01-20"
+    },
+    {
+      "id": "US-110",
+      "title": "Mobile App Push Notifications",
+      "description": "As a mobile user, I want to receive push notifications so that I'm alerted to important updates",
+      "status": "To Do",
+      "story_points": null,
+      "priority": "High",
+      "assignee": "Sarah Wilson",
+      "acceptance_criteria": [
+        "Integration with Firebase Cloud Messaging",
+        "User can customize notification preferences"
+      ],
+      "blockers": [],
+      "created_date": "2024-01-21"
     }
   ],
   "team_capacity": {
-    "total_points": 34,
-    "committed_points": 21,
+    "total_points": 58,
+    "committed_points": 37,
     "completed_points": 5
   },
   "backlog_health": {
-    "ready_stories": 12,
-    "stories_needing_refinement": 8,
-    "epics_without_stories": 2
+    "ready_stories": 15,
+    "stories_needing_refinement": 12,
+    "epics_without_stories": 3,
+    "stories_missing_acceptance_criteria": 2,
+    "stories_missing_estimates": 3
   }
 }
