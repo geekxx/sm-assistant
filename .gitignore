@@ -87,3 +87,11 @@ coverage.xml
 *.tmp
 *.temp
 .cache/foundation/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+*.tflock
+.terraform.lock.hcl

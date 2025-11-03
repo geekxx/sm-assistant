@@ -16,7 +16,7 @@ export let USER_ID: string | null = null;
 export let USER_INFO: UserInfo | null = null;
 
 export let config = {
-    API_URL: "http://localhost:8000/api",
+    API_URL: "http://localhost:8005/api",
     ENABLE_AUTH: false,
 };
 

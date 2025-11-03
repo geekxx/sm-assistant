@@ -4,10 +4,12 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (add Node.js for frontend build)
 RUN apt-get update && apt-get install -y \
     gcc \
     curl \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
@@ -16,22 +18,30 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy frontend dependencies and build
+COPY src/frontend/package*.json ./src/frontend/
+RUN cd src/frontend && npm ci
+
+# Copy all source code
 COPY src/ ./src/
 COPY scrum_master_team_sk.json .
 COPY .env.example .env
+
+# Build frontend
+RUN cd src/frontend && npm run build
 
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash appuser && \
     chown -R appuser:appuser /app
 USER appuser
 
-# Expose port
-EXPOSE 8005
+# Expose ports (Railway uses PORT env var)
+EXPOSE 8005 3001
+ENV PORT=8005
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8005/health || exit 1
 
-# Run the application
-CMD ["python", "src/backend/main_production.py"]
+# Run application (Railway optimized)
+CMD ["python", "src/backend/main_production_sk.py"]

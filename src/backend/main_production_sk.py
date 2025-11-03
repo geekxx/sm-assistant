@@ -75,6 +75,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# API routes will be mounted under /api, static files at /
+from fastapi.staticfiles import StaticFiles
+import os
+
 # Security
 security = HTTPBearer(auto_error=False)
 
@@ -366,10 +370,10 @@ Provide strategic coaching guidance and actionable recommendations for agile tea
             prompt_template_config=prompt_config
         )
         
-        # Execute with shorter timeout
+        # Execute with longer timeout for complex analysis
         result = await asyncio.wait_for(
             semantic_kernel.invoke(function),
-            timeout=15.0
+            timeout=60.0  # Increased from 15s to 60s for metrics analysis
         )
         
         return {
@@ -1430,6 +1434,15 @@ async def startup_tasks():
 @app.on_event("startup")
 async def startup_event():
     await startup_tasks()
+    
+    # Mount static files after startup (to avoid conflicts with API routes)
+    frontend_build_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "dist")
+    if os.path.exists(frontend_build_path):
+        app.mount("/", StaticFiles(directory=frontend_build_path, html=True), name="frontend")
+        logger.info(f"✅ Serving frontend from: {frontend_build_path}")
+    else:
+        logger.warning(f"⚠️  Frontend build not found at: {frontend_build_path}")
+        logger.info("📁 Try running: cd src/frontend && npm run build")
 
 if __name__ == "__main__":
     uvicorn.run(
