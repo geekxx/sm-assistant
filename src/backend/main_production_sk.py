@@ -517,6 +517,16 @@ async def health_check():
             "timestamp": datetime.now().isoformat()
         }
 
+@app.get("/config")
+async def get_config():
+    """Frontend configuration endpoint"""
+    return {
+        "API_URL": "https://sm-assistant-production.up.railway.app",
+        "ENABLE_AUTH": False,
+        "status": "production",
+        "version": "1.0.0"
+    }
+
 @app.post("/agents/chat")
 async def chat_with_agent_endpoint(chat_request: ChatRequest, request: Request):
     """Manual chat endpoint with conversation context"""
