@@ -295,8 +295,8 @@ async def intelligent_agent_routing(message: str, uploaded_files: Dict[str, Any]
     )
     
     has_meeting_data = any(
-        'standup' in filename.lower() or 'meeting' in filename.lower() or 
-        'transcript' in filename.lower() or filename.lower().endswith('.md')
+        ('standup' in filename.lower() or 'meeting' in filename.lower() or 
+         'transcript' in filename.lower()) and 'slack' not in filename.lower() and 'communication' not in filename.lower()
         for filename in uploaded_files.keys()
     )
     
@@ -309,7 +309,7 @@ async def intelligent_agent_routing(message: str, uploaded_files: Dict[str, Any]
     
     has_communication_data = any(
         'slack' in filename.lower() or 'chat' in filename.lower() or 
-        'communication' in filename.lower()
+        'communication' in filename.lower() or 'channels' in filename.lower()
         for filename in uploaded_files.keys()
     )
     
@@ -371,7 +371,13 @@ async def intelligent_agent_routing(message: str, uploaded_files: Dict[str, Any]
     if has_communication_data:
         agent_scores['wellness'] += 2
     
-    # Special high-confidence routing rules
+    # Special high-confidence routing rules (order matters - more specific first)
+    
+    # Team communication files take priority for wellness analysis
+    if has_communication_data and any(kw in msg_lower for kw in ['team', 'wellness', 'communication', 'sentiment', 'analyze', 'channels', 'slack']):
+        logger.info(f"High-confidence routing to Team Wellness agent (communication file detected)")
+        return 'wellness'
+    
     if any(kw in msg_lower for kw in ['bottleneck', 'flow analysis', 'cycle time', 'dwell time', 'analyze flow', 'stage analysis']):
         logger.info(f"High-confidence routing to Flow Metrics agent")
         return 'metrics'
@@ -380,11 +386,11 @@ async def intelligent_agent_routing(message: str, uploaded_files: Dict[str, Any]
         logger.info(f"High-confidence routing to Backlog Intelligence agent")
         return 'backlog'
         
-    if any(kw in msg_lower for kw in ['standup', 'action items', 'impediments', 'blockers', 'meeting analysis']):
+    if any(kw in msg_lower for kw in ['standup', 'action items', 'impediments', 'blockers', 'meeting analysis']) and not has_communication_data:
         logger.info(f"High-confidence routing to Meeting Intelligence agent")
         return 'meetings'
         
-    if any(kw in msg_lower for kw in ['sentiment', 'wellness', 'burnout', 'team health']):
+    if any(kw in msg_lower for kw in ['sentiment', 'wellness', 'burnout', 'team health', 'stress', 'morale']):
         logger.info(f"High-confidence routing to Team Wellness agent")
         return 'wellness'
     
