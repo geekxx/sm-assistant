@@ -44,4 +44,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8005/health || exit 1
 
 # Run application (Railway optimized)
-CMD ["python", "src/backend/main_production_sk.py"]
+CMD ["python", "src/backend/main_simple_api.py"]
