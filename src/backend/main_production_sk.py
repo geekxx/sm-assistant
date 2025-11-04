@@ -482,7 +482,7 @@ async def direct_azure_chat(message: str, agent_name: str) -> Dict[str, Any]:
             "timestamp": datetime.now().isoformat()
         }
 
-@app.get("/")
+@app.get("/api")
 async def root():
     """Root endpoint with system information"""
     return {
