@@ -118,9 +118,6 @@
       "labels": ["billing", "mvp"],
       "flags": { "unestimated": true }
     },
-
-    // --- Stories / Tasks / Bugs ---
-
     {
       "key": "THUN-200",
       "type": "Story",
@@ -378,9 +375,6 @@
       "labels": ["frontend", "billing"],
       "flags": { "unassigned": true, "unestimated": true, "missing_ac": true }
     },
-
-    // --- Orphans (no epic/parent) ---
-
     {
       "key": "THUN-300",
       "type": "Story",
@@ -434,9 +428,6 @@
       "labels": ["auth", "staging"],
       "flags": { "orphan": true }
     },
-
-    // --- Process / Wellness ---
-
     {
       "key": "THUN-303",
       "type": "Story",
@@ -503,9 +494,6 @@
       "duplicate_of": "THUN-308",
       "flags": { "duplicate": true, "unestimated": true, "unassigned": true }
     },
-
-    // --- More stories for coverage ---
-
     {
       "key": "THUN-306",
       "type": "Story",
