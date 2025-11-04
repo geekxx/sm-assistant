@@ -398,111 +398,6 @@ async def intelligent_agent_routing(message: str, uploaded_files: Dict[str, Any]
     logger.info(f"No clear routing match, using general agent")
     return 'general'
 
-async def intelligent_agent_routing(message: str, uploaded_files: Dict[str, Any]) -> str:
-    """Analyze user request and route to most appropriate agent"""
-    
-    # Convert message to lowercase for keyword matching
-    msg_lower = message.lower()
-    
-    # Analyze uploaded files for context
-    has_backlog_data = any(
-        'backlog' in filename.lower() or 'stories' in filename.lower() or 
-        (filename.lower().endswith('.json') and 'items' in file_info.get('full_content', ''))
-        for filename, file_info in uploaded_files.items()
-    )
-    
-    has_meeting_data = any(
-        'standup' in filename.lower() or 'meeting' in filename.lower() or 
-        'transcript' in filename.lower() or filename.lower().endswith('.md')
-        for filename in uploaded_files.keys()
-    )
-    
-    has_metrics_data = any(
-        'metrics' in filename.lower() or 'csv' in filename.lower() or
-        any(keyword in file_info.get('full_content', '').lower() 
-            for keyword in ['cycle time', 'lead time', 'throughput', 'velocity'])
-        for filename, file_info in uploaded_files.items()
-    )
-    
-    has_communication_data = any(
-        'slack' in filename.lower() or 'chat' in filename.lower() or 
-        'communication' in filename.lower()
-        for filename in uploaded_files.keys()
-    )
-    
-    # Flow Metrics Agent - High Priority Keywords
-    flow_keywords = [
-        'bottleneck', 'flow', 'cycle time', 'lead time', 'throughput', 'velocity',
-        'wip', 'work in progress', 'stage', 'dwell time', 'delivery metrics',
-        'flow efficiency', 'performance', 'analytics', 'trend', 'flow analysis'
-    ]
-    
-    # Backlog Intelligence Agent Keywords  
-    backlog_keywords = [
-        'user story', 'acceptance criteria', 'backlog', 'epic', 'refinement',
-        'story points', 'estimation', 'prioritization', 'product backlog',
-        'sprint planning', 'story', 'feature'
-    ]
-    
-    # Meeting Intelligence Agent Keywords
-    meeting_keywords = [
-        'standup', 'retrospective', 'retro', 'daily', 'meeting', 'action items',
-        'impediments', 'blockers', 'transcript', 'notes', 'discussion'
-    ]
-    
-    # Team Wellness Agent Keywords
-    wellness_keywords = [
-        'burnout', 'stress', 'morale', 'sentiment', 'wellness', 'workload',
-        'overtime', 'team health', 'communication', 'conflict', 'support'
-    ]
-    
-    # Agile Coaching Agent Keywords
-    coaching_keywords = [
-        'process improvement', 'agile practices', 'scrum master', 'coaching',
-        'team dynamics', 'continuous improvement', 'methodology', 'framework'
-    ]
-    
-    # Count keyword matches for each agent
-    agent_scores = {
-        'metrics': sum(1 for kw in flow_keywords if kw in msg_lower),
-        'backlog': sum(1 for kw in backlog_keywords if kw in msg_lower), 
-        'meetings': sum(1 for kw in meeting_keywords if kw in msg_lower),
-        'wellness': sum(1 for kw in wellness_keywords if kw in msg_lower),
-        'coaching': sum(1 for kw in coaching_keywords if kw in msg_lower)
-    }
-    
-    # Boost scores based on uploaded file context
-    if has_metrics_data or has_backlog_data:
-        agent_scores['metrics'] += 2  # Flow analysis often uses backlog/metrics data
-        
-    if has_backlog_data:
-        agent_scores['backlog'] += 2
-        
-    if has_meeting_data:
-        agent_scores['meetings'] += 2
-        
-    if has_communication_data:
-        agent_scores['wellness'] += 2
-    
-    # Special routing rules for high-confidence cases
-    if any(kw in msg_lower for kw in ['bottleneck', 'flow analysis', 'cycle time', 'dwell time']):
-        return 'metrics'
-        
-    if any(kw in msg_lower for kw in ['user story', 'acceptance criteria', 'story points']):
-        return 'backlog'
-        
-    if any(kw in msg_lower for kw in ['standup', 'action items', 'impediments', 'blockers']):
-        return 'meetings'
-    
-    # Find agent with highest score
-    if max(agent_scores.values()) > 0:
-        best_agent = max(agent_scores, key=agent_scores.get)
-        logger.info(f"Auto-routed to {best_agent} agent (score: {agent_scores[best_agent]})")
-        return best_agent
-    
-    # Default to general if no clear match
-    return 'general'
-
 async def chat_with_openai(message: str, agent_type: str = "general", session_id: Optional[str] = None) -> Dict[str, Any]:
     """Chat with OpenAI using the specified agent context and session history"""
     
@@ -590,9 +485,9 @@ async def chat_with_openai(message: str, agent_type: str = "general", session_id
 
 # FastAPI app
 app = FastAPI(
-    title="SM Assistant - Simplified",
-    description="Scrum Master Assistant with OpenAI integration",
-    version="2.0.0"
+    title="SM Assistant - Simplified", 
+    description="Scrum Master Assistant with OpenAI integration and intelligent routing",
+    version="2.1.0"  # Updated: Nov 4, 2025 - Added intelligent routing, file uploads, session memory
 )
 
 # CORS middleware
