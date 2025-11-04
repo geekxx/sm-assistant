@@ -231,7 +231,36 @@ async def load_sm_agents():
     global sm_agents
     
     if not ai_client:
-        logger.warning("Azure AI client not available")
+        logger.warning("Azure AI client not available - loading demo agents")
+        # Load demo agents for demonstration purposes
+        sm_agents = {
+            "backlog": type('MockAgent', (), {
+                'name': 'SM-Asst-Backlog-Intelligence', 
+                'id': 'demo-backlog',
+                'description': 'Creates user stories, acceptance criteria, and manages product backlogs'
+            })(),
+            "meeting": type('MockAgent', (), {
+                'name': 'SM-Asst-Meeting-Intelligence', 
+                'id': 'demo-meeting',
+                'description': 'Facilitates meetings, tracks action items, and detects impediments'
+            })(),
+            "metrics": type('MockAgent', (), {
+                'name': 'SM-Asst-Flow-Metrics', 
+                'id': 'demo-metrics',
+                'description': 'Analyzes delivery metrics, identifies bottlenecks, and provides coaching insights'
+            })(),
+            "wellness": type('MockAgent', (), {
+                'name': 'SM-Asst-Team-Wellness', 
+                'id': 'demo-wellness',
+                'description': 'Monitors team sentiment, detects burnout, and tracks engagement'
+            })(),
+            "coaching": type('MockAgent', (), {
+                'name': 'SM-Asst-Agile-Coaching', 
+                'id': 'demo-coaching',
+                'description': 'Provides strategic guidance and synthesizes insights from all agents'
+            })()
+        }
+        logger.info(f"✅ Loaded {len(sm_agents)} demo SM-Assistant agents")
         return
     
     try:
