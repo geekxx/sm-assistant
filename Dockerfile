@@ -19,7 +19,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy frontend dependencies and build
-COPY src/frontend/package*.json ./src/frontend/
+COPY src/frontend/package.json src/frontend/package-lock.json ./src/frontend/
 RUN cd src/frontend && npm ci
 
 # Copy all source code
