@@ -373,6 +373,11 @@ async def intelligent_agent_routing(message: str, uploaded_files: Dict[str, Any]
     
     # Special high-confidence routing rules (order matters - more specific first)
     
+    # Meeting files take priority for meeting analysis when user asks to analyze/process them
+    if has_meeting_data and any(kw in msg_lower for kw in ['analyze', 'process', 'review', 'summary', 'standup', 'meeting', 'transcript', 'action items', 'impediments']):
+        logger.info(f"High-confidence routing to Meeting Intelligence agent (meeting file detected)")
+        return 'meetings'
+    
     # Team communication files take priority for wellness analysis
     if has_communication_data and any(kw in msg_lower for kw in ['team', 'wellness', 'communication', 'sentiment', 'analyze', 'channels', 'slack']):
         logger.info(f"High-confidence routing to Team Wellness agent (communication file detected)")
@@ -493,7 +498,7 @@ async def chat_with_openai(message: str, agent_type: str = "general", session_id
 app = FastAPI(
     title="SM Assistant - Simplified", 
     description="Scrum Master Assistant with OpenAI integration and intelligent routing",
-    version="2.1.1"  # RAILWAY DEPLOY: Nov 4, 2025 20:44 - File uploads, session memory, intelligent routing, team wellness fix
+    version="2.1.2"  # RAILWAY DEPLOY: Nov 4, 2025 20:48 - Fixed meeting transcript routing to Meeting Intelligence Agent
 )
 
 # CORS middleware
