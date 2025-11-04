@@ -1455,9 +1455,11 @@ async def startup_event():
         logger.info("📁 Try running: cd src/frontend && npm run build")
 
 if __name__ == "__main__":
+    # Use Railway's PORT environment variable or fallback to 8005
+    port = int(os.getenv("PORT", 8005))
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8005,
+        port=port,
         log_level="info"
     )
