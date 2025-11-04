@@ -493,7 +493,7 @@ async def chat_with_openai(message: str, agent_type: str = "general", session_id
 app = FastAPI(
     title="SM Assistant - Simplified", 
     description="Scrum Master Assistant with OpenAI integration and intelligent routing",
-    version="2.1.0"  # FORCE DEPLOY: Nov 4, 2025 - Added intelligent routing, file uploads, session memory
+    version="2.1.1"  # RAILWAY DEPLOY: Nov 4, 2025 20:44 - File uploads, session memory, intelligent routing, team wellness fix
 )
 
 # CORS middleware
