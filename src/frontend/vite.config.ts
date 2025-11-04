@@ -24,7 +24,7 @@ export default defineConfig({
 
     // Build configuration
     build: {
-        outDir: 'build',
+        outDir: 'dist',
         sourcemap: true,
         // Optimize dependencies
         rollupOptions: {
