@@ -57,10 +57,15 @@ sessions = defaultdict(lambda: {
     "last_activity": datetime.now().isoformat()
 })
 
+class AttachedFile(BaseModel):
+    filename: str
+    content: str
+
 class ChatRequest(BaseModel):
     message: str
     agent_type: Optional[str] = "general"
     session_id: Optional[str] = None
+    attached_file: Optional[AttachedFile] = None
 
 class ChatResponse(BaseModel):
     response: str
@@ -498,7 +503,7 @@ async def chat_with_openai(message: str, agent_type: str = "general", session_id
 app = FastAPI(
     title="SM Assistant - Simplified", 
     description="Scrum Master Assistant with OpenAI integration and intelligent routing",
-    version="2.1.2"  # RAILWAY DEPLOY: Nov 4, 2025 20:48 - Fixed meeting transcript routing to Meeting Intelligence Agent
+    version="2.2.0"  # RAILWAY DEPLOY: Nov 4, 2025 20:55 - ChatGPT-style file attachments (no paste, auto-include)
 )
 
 # CORS middleware
@@ -569,7 +574,12 @@ async def chat_endpoint(request: ChatRequest) -> ChatResponse:
             success=False
         )
     
-    result = await chat_with_openai(request.message, request.agent_type or "general", session_id)
+    # If there's an attached file, include it in the message
+    enhanced_message = request.message
+    if request.attached_file:
+        enhanced_message = f"File: {request.attached_file.filename}\n\nContent:\n{request.attached_file.content}\n\nUser message: {request.message}"
+    
+    result = await chat_with_openai(enhanced_message, request.agent_type or "general", session_id)
     
     if result["success"]:
         return ChatResponse(

@@ -382,6 +382,21 @@
             margin-bottom: 15px;
             font-size: 13px;
         }
+
+        .file-attachment-info {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .file-attachment-info p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -428,7 +443,7 @@
             <div class="input-container">
                 <textarea 
                     id="messageInput" 
-                    placeholder="Ask me about user stories, sprint planning, team metrics, or anything scrum-related... You can also drag & drop files above!"
+                    placeholder="Ask me about user stories, sprint planning, team metrics, or anything scrum-related... (Attach files by dragging them above)"
                     rows="1"
                 ></textarea>
                 <button id="sendButton" onclick="sendMessage()">Send</button>
@@ -557,12 +572,18 @@
             const sendButton = document.getElementById('sendButton');
 
             const message = input.value.trim();
-            if (!message) return;
+            if (!message && !currentFileContent) return;
 
-            // Add user message
+            // Add user message with file attachment indicator
             const userDiv = document.createElement('div');
             userDiv.className = 'message user';
-            userDiv.textContent = message;
+            
+            let displayMessage = message;
+            if (currentFileContent && currentFileName) {
+                displayMessage = `📎 ${currentFileName}\n${message || 'Please analyze this file.'}`;
+            }
+            
+            userDiv.textContent = displayMessage;
             chatArea.appendChild(userDiv);
 
             // Clear input and show loading
@@ -583,16 +604,27 @@
                     await initializeSession();
                 }
 
+                // Prepare the request payload
+                const payload = {
+                    message: message || 'Please analyze the attached file.',
+                    agent_type: agentSelect.value,
+                    session_id: sessionId
+                };
+
+                // Include file content if attached
+                if (currentFileContent && currentFileName) {
+                    payload.attached_file = {
+                        filename: currentFileName,
+                        content: currentFileContent
+                    };
+                }
+
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        message: message,
-                        agent_type: agentSelect.value,
-                        session_id: sessionId
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await response.json();
@@ -613,6 +645,11 @@
                     <div>${formatMarkdown(data.response)}</div>
                 `;
                 chatArea.appendChild(assistantDiv);
+
+                // Clear file attachment after successful message
+                if (currentFileContent) {
+                    clearFilePreview();
+                }
 
             } catch (error) {
                 chatArea.removeChild(loadingDiv);
@@ -771,11 +808,11 @@
                         <span>📄 ${fileData.filename} (${fileSize} KB)</span>
                         <span>${fileData.content_type}</span>
                     </div>
-                    <div class="file-content">${fileData.preview}</div>
+                    <div class="file-attachment-info">
+                        <p>✅ File attached - content will be included with your next message</p>
+                    </div>
                     <div class="file-actions">
-                        <button class="primary" onclick="insertFileContent()">📝 Analyze this file</button>
-                        <button onclick="insertFileReference()">📋 Reference in message</button>
-                        <button onclick="clearFilePreview()">❌ Remove</button>
+                        <button onclick="clearFilePreview()">❌ Remove attachment</button>
                     </div>
                 </div>
             `;
@@ -801,39 +838,7 @@
             document.getElementById('fileInput').value = '';
         }
 
-        function insertFileContent() {
-            if (currentFileContent && currentFileName) {
-                const messageInput = document.getElementById('messageInput');
-                const prefix = `Please analyze this ${currentFileName.split('.').pop().toUpperCase()} file:\n\n`;
-                messageInput.value = prefix + currentFileContent;
-                
-                // Auto-resize textarea
-                messageInput.style.height = 'auto';
-                messageInput.style.height = messageInput.scrollHeight + 'px';
-                
-                clearFilePreview();
-                messageInput.focus();
-            }
-        }
 
-        function insertFileReference() {
-            if (currentFileContent && currentFileName) {
-                const messageInput = document.getElementById('messageInput');
-                const currentText = messageInput.value;
-                const reference = currentText ? 
-                    `${currentText}\n\nReference file: ${currentFileName}\nContent: ${currentFileContent}` :
-                    `I have uploaded a file (${currentFileName}). Please analyze:\n\n${currentFileContent}`;
-                
-                messageInput.value = reference;
-                
-                // Auto-resize textarea
-                messageInput.style.height = 'auto';
-                messageInput.style.height = messageInput.scrollHeight + 'px';
-                
-                clearFilePreview();
-                messageInput.focus();
-            }
-        }
 
         // Initialize
         checkStatus();
