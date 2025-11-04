@@ -25,7 +25,6 @@ RUN cd src/frontend && npm install
 
 # Copy all source code
 COPY src/ ./src/
-COPY scrum_master_team_sk.json .
 COPY .env.example .env
 
 # Verify correct version is being built
