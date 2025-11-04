@@ -1,7 +1,7 @@
 # Use Python 3.11 slim base image
 FROM python:3.11-slim
 
-# Force rebuild timestamp: Nov 4, 2025 20:47
+# Force rebuild timestamp: Nov 4, 2025 20:50
 # Set working directory
 WORKDIR /app
 
@@ -28,7 +28,7 @@ COPY src/ ./src/
 COPY .env.example .env
 
 # Verify correct version is being built
-RUN grep -q "version.*2.1.1" src/backend/main_simple_api.py || (echo "ERROR: Wrong version being built!" && exit 1)
+RUN grep -q "version.*2.1.2" src/backend/main_simple_api.py || (echo "ERROR: Wrong version being built!" && exit 1)
 
 # Build frontend
 RUN cd src/frontend && npm run build
