@@ -170,12 +170,4 @@
     "total_points": 58,
     "committed_points": 37,
     "completed_points": 5
-  },
-  "backlog_health": {
-    "ready_stories": 15,
-    "stories_needing_refinement": 12,
-    "epics_without_stories": 3,
-    "stories_missing_acceptance_criteria": 2,
-    "stories_missing_estimates": 3
-  }
 }

@@ -18,6 +18,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uvicorn
+import uuid
+from collections import defaultdict
 
 # Simple OpenAI client
 try:
@@ -47,14 +49,24 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 openai_client = None
 sm_agents = {}
 
+# Session management
+sessions = defaultdict(lambda: {
+    "conversation_history": [],
+    "uploaded_files": {},
+    "created_at": datetime.now().isoformat(),
+    "last_activity": datetime.now().isoformat()
+})
+
 class ChatRequest(BaseModel):
     message: str
     agent_type: Optional[str] = "general"
+    session_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str
     agent: str
     timestamp: str
+    session_id: str
     success: bool = True
 
 class FileUploadResponse(BaseModel):
@@ -65,6 +77,7 @@ class FileUploadResponse(BaseModel):
     preview: str
     full_content: str
     timestamp: str
+    session_id: str
     error: Optional[str] = None
 
 async def initialize_openai_client() -> bool:
@@ -236,8 +249,8 @@ async def process_uploaded_file(file: UploadFile) -> Dict[str, Any]:
             "error": f"Error processing file: {str(e)}"
         }
 
-async def chat_with_openai(message: str, agent_type: str = "general") -> Dict[str, Any]:
-    """Chat with OpenAI using the specified agent context"""
+async def chat_with_openai(message: str, agent_type: str = "general", session_id: Optional[str] = None) -> Dict[str, Any]:
+    """Chat with OpenAI using the specified agent context and session history"""
     
     if not openai_client:
         return {
@@ -246,13 +259,40 @@ async def chat_with_openai(message: str, agent_type: str = "general") -> Dict[st
         }
     
     try:
+        # Generate session ID if not provided
+        if not session_id:
+            session_id = str(uuid.uuid4())
+        
+        # Get or create session
+        session = sessions[session_id]
+        session["last_activity"] = datetime.now().isoformat()
+        
         agent_config = sm_agents.get(agent_type, sm_agents["general"])
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4")
         
-        messages = [
-            {"role": "system", "content": agent_config["system_prompt"]},
-            {"role": "user", "content": message}
-        ]
+        # Build messages with conversation history and file context
+        messages = [{"role": "system", "content": agent_config["system_prompt"]}]
+        
+        # Add file context if files are uploaded in this session
+        if session["uploaded_files"]:
+            file_context = "\n\nUploaded Files in this session:\n"
+            for filename, file_info in session["uploaded_files"].items():
+                file_context += f"\n--- {filename} ({file_info['content_type']}) ---\n"
+                file_context += file_info['full_content'][:2000]  # Limit context size
+                if len(file_info['full_content']) > 2000:
+                    file_context += "\n... (content truncated) ..."
+                file_context += "\n"
+            
+            # Add file context as a system message
+            messages.append({"role": "system", "content": f"Files uploaded in this session:{file_context}"})
+        
+        # Add conversation history (last 10 messages to manage token limits)
+        for chat in session["conversation_history"][-10:]:
+            messages.append({"role": "user", "content": chat["user_message"]})
+            messages.append({"role": "assistant", "content": chat["assistant_response"]})
+        
+        # Add current message
+        messages.append({"role": "user", "content": message})
         
         response = await openai_client.chat.completions.create(
             model=deployment_name,
@@ -261,18 +301,30 @@ async def chat_with_openai(message: str, agent_type: str = "general") -> Dict[st
             temperature=0.7
         )
         
+        assistant_response = response.choices[0].message.content
+        
+        # Store conversation in session history
+        session["conversation_history"].append({
+            "user_message": message,
+            "assistant_response": assistant_response,
+            "agent_type": agent_type,
+            "timestamp": datetime.now().isoformat()
+        })
+        
         return {
             "success": True,
-            "response": response.choices[0].message.content,
+            "response": assistant_response,
             "agent": agent_config["name"],
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            "session_id": session_id
         }
         
     except Exception as e:
         logger.error(f"OpenAI chat error: {e}")
         return {
             "success": False,
-            "error": str(e)
+            "error": str(e),
+            "session_id": session_id if session_id else "unknown"
         }
 
 # FastAPI app
@@ -336,23 +388,28 @@ async def get_config():
 
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest) -> ChatResponse:
-    """Main chat endpoint"""
+    """Main chat endpoint with session management"""
+    
+    # Generate session ID if not provided
+    session_id = request.session_id or str(uuid.uuid4())
     
     if not openai_client:
         return ChatResponse(
             response="I'm currently running in demo mode. OpenAI integration is not available.",
             agent="Demo Mode",
             timestamp=datetime.now().isoformat(),
+            session_id=session_id,
             success=False
         )
     
-    result = await chat_with_openai(request.message, request.agent_type)
+    result = await chat_with_openai(request.message, request.agent_type or "general", session_id)
     
     if result["success"]:
         return ChatResponse(
             response=result["response"],
             agent=result["agent"],
             timestamp=result["timestamp"],
+            session_id=result["session_id"],
             success=True
         )
     else:
@@ -360,6 +417,7 @@ async def chat_endpoint(request: ChatRequest) -> ChatResponse:
             response=f"Sorry, I encountered an error: {result.get('error', 'Unknown error')}",
             agent="Error Handler", 
             timestamp=datetime.now().isoformat(),
+            session_id=result.get("session_id", session_id),
             success=False
         )
 
@@ -377,13 +435,53 @@ async def list_agents():
         ]
     }
 
+@app.get("/api/session/new")
+async def create_new_session():
+    """Create a new session and return session ID"""
+    session_id = str(uuid.uuid4())
+    # Initialize session (it will be created automatically by defaultdict)
+    sessions[session_id]["created_at"] = datetime.now().isoformat()
+    return {"session_id": session_id}
+
+@app.get("/api/session/{session_id}")
+async def get_session_info(session_id: str):
+    """Get session information"""
+    if session_id not in sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    session = sessions[session_id]
+    return {
+        "session_id": session_id,
+        "created_at": session["created_at"],
+        "last_activity": session["last_activity"],
+        "conversation_count": len(session["conversation_history"]),
+        "uploaded_files": list(session["uploaded_files"].keys())
+    }
+
 @app.post("/api/upload")
-async def upload_file(file: UploadFile = File(...)) -> FileUploadResponse:
-    """Handle file uploads for drag-and-drop functionality"""
+async def upload_file(
+    file: UploadFile = File(...),
+    session_id: Optional[str] = None
+) -> FileUploadResponse:
+    """Handle file uploads for drag-and-drop functionality with session management"""
+    
+    # Generate session ID if not provided
+    if not session_id:
+        session_id = str(uuid.uuid4())
     
     result = await process_uploaded_file(file)
     
     if result["success"]:
+        # Store file in session
+        session = sessions[session_id]
+        session["uploaded_files"][result["filename"]] = {
+            "content_type": result["content_type"],
+            "file_size": result["file_size"],
+            "full_content": result["full_content"],
+            "uploaded_at": result["timestamp"]
+        }
+        session["last_activity"] = datetime.now().isoformat()
+        
         return FileUploadResponse(
             success=True,
             filename=result["filename"],
@@ -391,7 +489,8 @@ async def upload_file(file: UploadFile = File(...)) -> FileUploadResponse:
             file_size=result["file_size"],
             preview=result["preview"],
             full_content=result["full_content"],
-            timestamp=result["timestamp"]
+            timestamp=result["timestamp"],
+            session_id=session_id
         )
     else:
         return FileUploadResponse(
@@ -402,6 +501,7 @@ async def upload_file(file: UploadFile = File(...)) -> FileUploadResponse:
             preview="",
             full_content="",
             timestamp=datetime.now().isoformat(),
+            session_id=session_id,
             error=result["error"]
         )
 

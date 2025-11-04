@@ -1,0 +1,2077 @@
+{
+  "team": "Thunderbolt",
+  "product": "Agentic AI Customer Service Chatbot",
+  "timezone": "America/Los_Angeles",
+  "generated_at": "2025-11-04T14:30:00-08:00",
+  "sprints": [
+    {
+      "id": "SPR-31",
+      "start_date": "2025-09-22",
+      "end_date": "2025-10-03"
+    },
+    {
+      "id": "SPR-32",
+      "start_date": "2025-10-06",
+      "end_date": "2025-10-17"
+    },
+    {
+      "id": "SPR-33",
+      "start_date": "2025-10-20",
+      "end_date": "2025-10-31"
+    },
+    {
+      "id": "SPR-34",
+      "start_date": "2025-11-03",
+      "end_date": "2025-11-14"
+    }
+  ],
+  "note": "Per requirement, stories in Backlog have no assignee and no sprint. Stage history includes timestamps for each transition. A few Bugs are included in addition to story counts.",
+  "items": [
+    {
+      "id": "TBOT-2001",
+      "type": "Story",
+      "story": "As a customer, I can authenticate with a one-time SMS code, so that I can securely chat without creating an account.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": [
+        "auth",
+        "onboarding",
+        "chatbot"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-28T10:08:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-28T10:35:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:00:00-08:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "OTP is 6 digits with expiry \u2264 10 minutes; expired or wrong OTPs are rejected with a clear error message.",
+        "Resend is rate-limited to \u2264 3 attempts per 15 minutes per phone number.",
+        "Successful verification establishes a session linked to the customer record without exposing PII.",
+        "Given I am a customer with required permissions, when I authenticate with a one-time SMS code, then the result supports: I can securely chat without creating an account.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2002",
+      "type": "Story",
+      "story": "As a support manager, I can configure escalation rules based on keywords and sentiment, so that conversations hand off to humans at the right time.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": [
+        "routing",
+        "sentiment",
+        "policy"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-29T09:20:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-29T09:40:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Negative sentiment score above threshold triggers handoff within \u2264 30 seconds.",
+        "Manual 'talk to agent' always overrides automation and preserves transcript.",
+        "Given I am a support manager with required permissions, when I configure escalation rules based on keywords and sentiment, then the result supports: conversations hand off to humans at the right time.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2003",
+      "type": "Story",
+      "story": "As a customer, I can switch languages mid-conversation, so that I can get help in my preferred language.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": [
+        "i18n",
+        "nlp",
+        "multilingual"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-27T14:18:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-27T14:35:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Switching language mid-chat preserves conversation context and persona.",
+        "Glossary terms render using locale-specific translations; dates/currency follow locale formats.",
+        "Given I am a customer with required permissions, when I switch languages mid-conversation, then the result supports: I can get help in my preferred language.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2004",
+      "type": "Story",
+      "story": "As a support agent, I can view the bot\u2019s reasoning trace and tool calls, so that I can audit and correct decisions.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": [
+        "observability",
+        "explainability",
+        "agent"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-30T11:12:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-30T11:30:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Reasoning view shows tool calls, inputs (masked), and outputs with timestamps.",
+        "Sensitive fields are redacted according to policy and access is role-gated.",
+        "Given I am a support agent with required permissions, when I view the bot\u2019s reasoning trace and tool calls, then the result supports: I can audit and correct decisions.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2005",
+      "type": "Story",
+      "story": "As a customer, I can upload a screenshot of an error, so that the assistant can diagnose my issue faster.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": [
+        "vision",
+        "attachments",
+        "ux"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-31T10:05:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-31T10:22:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Supported file types: PNG/JPG/PDF up to 5MB; larger files get graceful error.",
+        "Images are virus-scanned; PII detection blurs sensitive segments before storage.",
+        "Given I am a customer with required permissions, when I upload a screenshot of an error, then the result supports: the assistant can diagnose my issue faster.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2006",
+      "type": "Story",
+      "story": "As a support manager, I can define allowed tools (refund, RMA, order lookup), so that the bot executes authorized actions safely.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": [
+        "tools",
+        "governance",
+        "safety"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-28T13:15:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-28T13:40:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-01T09:10:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Only approved tools are callable; unapproved calls are blocked and logged.",
+        "Every tool call is auditable with actor, timestamp, params (masked), and outcome.",
+        "Given I am a support manager with required permissions, when I define allowed tools (refund, RMA, order lookup), then the result supports: the bot executes authorized actions safely.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2007",
+      "type": "Story",
+      "story": "As a customer, I can request a live agent at any time, so that I never feel trapped in automation.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": [
+        "handoff",
+        "ux",
+        "routing"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-26T15:05:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-26T15:25:00-07:00",
+          "actor": "sara"
+        }
+      ]
+    },
+    {
+      "id": "TBOT-2008",
+      "type": "Story",
+      "story": "As a support manager, I can A/B test prompt templates, so that we increase first-contact resolution.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": [
+        "experimentation",
+        "prompts",
+        "analytics"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-01T10:40:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-01T11:00:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Metrics reflect events within 5 minutes (p95) of occurrence.",
+        "Dashboard filters by date range, channel, and locale; exports CSV.",
+        "Given I am a support manager with required permissions, when I A/B test prompt templates, then the result supports: we increase first-contact resolution.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2009",
+      "type": "Story",
+      "story": "As a customer, I can see proactive shipping delay notifications in chat, so that I know what to expect.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": [
+        "events",
+        "notifications",
+        "logistics"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-27T09:35:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-27T09:55:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Given I am a customer with required permissions, when I see proactive shipping delay notifications in chat, then the result supports: I know what to expect.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2010",
+      "type": "Story",
+      "story": "As a compliance officer, I can review PII redaction logs, so that we meet GDPR obligations.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": [
+        "gdpr",
+        "pii",
+        "security"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-30T14:05:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-30T14:20:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "All PII fields are redacted in logs; access is traceable to user identity.",
+        "Data export/delete requests are fulfilled within SLA with audit trail.",
+        "Given I am a compliance officer with required permissions, when I review PII redaction logs, then the result supports: we meet GDPR obligations.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2011",
+      "type": "Story",
+      "story": "As a customer, I can resume a previous conversation, so that I don\u2019t have to repeat myself.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": [
+        "sessions",
+        "memory",
+        "chatbot"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-25T11:18:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-25T11:35:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Session context survives channel switch (SMS\u2194Web) within a 1-hour window.",
+        "If context is stale, the user is prompted to re-authenticate gracefully.",
+        "Given I am a customer with required permissions, when I resume a previous conversation, then the result supports: I don\u2019t have to repeat myself.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2012",
+      "type": "Story",
+      "story": "As a support manager, I can set SLAs for response time and escalation, so that service meets policy targets.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": [
+        "sla",
+        "policy",
+        "routing"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-02T09:10:00-08:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-02T09:25:00-08:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Negative sentiment score above threshold triggers handoff within \u2264 30 seconds.",
+        "Manual 'talk to agent' always overrides automation and preserves transcript.",
+        "Given I am a support manager with required permissions, when I set SLAs for response time and escalation, then the result supports: service meets policy targets.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2013",
+      "type": "Story",
+      "story": "As a customer, I can receive step-by-step troubleshooting flows, so that I can self-serve common issues.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": [
+        "guided-flows",
+        "kb",
+        "ux"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-03T08:50:00-08:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-03T09:05:00-08:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Answers cite the KB article ID and last-updated date in metadata.",
+        "Outdated articles (>30 days) are flagged for review in logs.",
+        "Given I am a customer with required permissions, when I receive step-by-step troubleshooting flows, then the result supports: I can self-serve common issues.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2014",
+      "type": "Story",
+      "story": "As a support agent, I can rate bot handoffs, so that the model learns from real outcomes.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": [
+        "feedback",
+        "learning",
+        "handoff"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-01T12:30:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-01T12:44:00-07:00",
+          "actor": "sara"
+        }
+      ]
+    },
+    {
+      "id": "TBOT-2015",
+      "type": "Story",
+      "story": "As a localization lead, I can manage glossaries per locale, so that brand terms stay consistent.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": [
+        "i18n",
+        "glossary",
+        "quality"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-24T15:50:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-24T16:05:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Switching language mid-chat preserves conversation context and persona.",
+        "Glossary terms render using locale-specific translations; dates/currency follow locale formats.",
+        "Given I am a localization lead with required permissions, when I manage glossaries per locale, then the result supports: brand terms stay consistent.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2016",
+      "type": "Story",
+      "story": "As a customer, I can check refund eligibility instantly, so that I know my options before contacting an agent.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": [
+        "refunds",
+        "policy",
+        "tools"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-23T09:15:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-23T09:35:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Only approved tools are callable; unapproved calls are blocked and logged.",
+        "Every tool call is auditable with actor, timestamp, params (masked), and outcome.",
+        "Refund eligibility returns determination in \u2264 2s for in-policy orders.",
+        "Idempotency ensures duplicate submissions within 5s do not double-refund.",
+        "Given I am a customer with required permissions, when I check refund eligibility instantly, then the result supports: I know my options before contacting an agent.",
+        "Error states are documented and return actionable messages without leaking internal details."
+      ]
+    },
+    {
+      "id": "TBOT-2017",
+      "type": "Story",
+      "story": "As a security engineer, I can approve third-party integrations, so that the bot only uses trusted tools.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": [
+        "security",
+        "integrations",
+        "governance"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-22T11:10:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-22T11:35:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Only approved tools are callable; unapproved calls are blocked and logged.",
+        "Every tool call is auditable with actor, timestamp, params (masked), and outcome.",
+        "All PII fields are redacted in logs; access is traceable to user identity.",
+        "Data export/delete requests are fulfilled within SLA with audit trail.",
+        "Given I am a security engineer with required permissions, when I approve third-party integrations, then the result supports: the bot only uses trusted tools.",
+        "Error states are documented and return actionable messages without leaking internal details."
+      ]
+    },
+    {
+      "id": "TBOT-2018",
+      "type": "Story",
+      "story": "As a customer, I can pay invoices in chat via secure checkout, so that billing issues are resolved faster.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 13,
+      "labels": [
+        "payments",
+        "pci",
+        "billing"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-02T13:05:00-08:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-02T13:20:00-08:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Payment flow uses tokenized data; no PAN stored; PCI scope documented.",
+        "Failed payment shows actionable error and no duplicate charges occur on retry.",
+        "Given I am a customer with required permissions, when I pay invoices in chat via secure checkout, then the result supports: billing issues are resolved faster.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2019",
+      "type": "Story",
+      "story": "As a knowledge manager, I can sync FAQs from our CMS, so that the bot answers from the latest content.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": [
+        "kb",
+        "sync",
+        "cms"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-03T11:22:00-08:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-03T11:40:00-08:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Answers cite the KB article ID and last-updated date in metadata.",
+        "Outdated articles (>30 days) are flagged for review in logs.",
+        "Given I am a knowledge manager with required permissions, when I sync FAQs from our CMS, then the result supports: the bot answers from the latest content.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2020",
+      "type": "Story",
+      "story": "As a customer, I can verify identity with optional voice biometrics, so that sensitive requests are protected.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": [
+        "voice",
+        "security",
+        "auth"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-21T10:40:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-21T10:55:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "OTP is 6 digits with expiry \u2264 10 minutes; expired or wrong OTPs are rejected with a clear error message.",
+        "Resend is rate-limited to \u2264 3 attempts per 15 minutes per phone number.",
+        "Successful verification establishes a session linked to the customer record without exposing PII.",
+        "All PII fields are redacted in logs; access is traceable to user identity.",
+        "Data export/delete requests are fulfilled within SLA with audit trail.",
+        "Given I am a customer with required permissions, when I verify identity with optional voice biometrics, then the result supports: sensitive requests are protected."
+      ]
+    },
+    {
+      "id": "TBOT-2901",
+      "type": "Bug",
+      "story": "Defect: Bot occasionally hallucinates order numbers when KB lookup fails.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": [
+        "bug",
+        "nlp",
+        "kb"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-03T15:05:00-08:00",
+          "actor": "support-bot"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-03T15:20:00-08:00",
+          "actor": "sara"
+        }
+      ]
+    },
+    {
+      "id": "TBOT-2902",
+      "type": "Bug",
+      "story": "Defect: Image attachments >5MB return 500 instead of graceful error.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 2,
+      "labels": [
+        "bug",
+        "attachments",
+        "api"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-01T09:55:00-07:00",
+          "actor": "qa-bot"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-01T10:10:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Reproduction steps documented and reproducible in staging.",
+        "Fix prevents recurrence; add regression test covering the repro path.",
+        "No related metrics degrade and no new errors appear in logs at p95 over 24h.",
+        "Supported file types: PNG/JPG/PDF up to 5MB; larger files get graceful error.",
+        "Images are virus-scanned; PII detection blurs sensitive segments before storage."
+      ]
+    },
+    {
+      "id": "TBOT-2101",
+      "type": "Story",
+      "story": "As a customer, I can check my order status by order ID, so that I get real-time updates without waiting for an agent.",
+      "sprint": "SPR-34",
+      "assignee": "mike",
+      "story_points": 5,
+      "labels": [
+        "orders",
+        "api",
+        "chatbot"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-27T10:08:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-27T10:30:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:02:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-03T13:15:00-08:00",
+          "actor": "mike"
+        },
+        {
+          "stage": "Blocked",
+          "ts": "2025-11-04T10:47:00-08:00",
+          "actor": "priya",
+          "note": "E2E seed mismatch"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-04T15:30:00-08:00",
+          "actor": "mike"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-11-05T11:05:00-08:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-11-05T15:40:00-08:00",
+          "actor": "priya"
+        }
+      ],
+      "acceptance_criteria": [
+        "Order lookup supports ID and email+postcode fallback with masked PII.",
+        "When an order is not found, user gets a non-leaking error and an offer to escalate.",
+        "Given I am a customer with required permissions, when I check my order status by order ID, then the result supports: I get real-time updates without waiting for an agent.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2102",
+      "type": "Story",
+      "story": "As a support manager, I can define escalation thresholds for negative sentiment, so that risky conversations reach humans quickly.",
+      "sprint": "SPR-34",
+      "assignee": "sam",
+      "story_points": 8,
+      "labels": [
+        "sentiment",
+        "routing",
+        "policy"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-28T09:05:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-28T09:25:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:10:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-03T12:45:00-08:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-11-05T16:05:00-08:00",
+          "actor": "alex"
+        }
+      ],
+      "acceptance_criteria": [
+        "Negative sentiment score above threshold triggers handoff within \u2264 30 seconds.",
+        "Manual 'talk to agent' always overrides automation and preserves transcript.",
+        "Given I am a support manager with required permissions, when I define escalation thresholds for negative sentiment, then the result supports: risky conversations reach humans quickly.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2103",
+      "type": "Story",
+      "story": "As a customer, I can receive a translated transcript email after chat, so that I can reference guidance in my language.",
+      "sprint": "SPR-34",
+      "assignee": "jules",
+      "story_points": 5,
+      "labels": [
+        "i18n",
+        "email",
+        "ux"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-29T13:50:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-29T14:10:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:12:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-04T10:02:00-08:00",
+          "actor": "jules"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-11-05T13:15:00-08:00",
+          "actor": "priya"
+        }
+      ],
+      "acceptance_criteria": [
+        "Switching language mid-chat preserves conversation context and persona.",
+        "Glossary terms render using locale-specific translations; dates/currency follow locale formats.",
+        "Email is sent within 5 minutes of chat end with correct locale and transcript.",
+        "Unsubscribe footer and support contact are included; links are valid.",
+        "Given I am a customer with required permissions, when I receive a translated transcript email after chat, then the result supports: I can reference guidance in my language.",
+        "Error states are documented and return actionable messages without leaking internal details."
+      ]
+    },
+    {
+      "id": "TBOT-2104",
+      "type": "Story",
+      "story": "As a supervisor, I can see bot confidence scores during conversations, so that I can trigger timely agent takeovers.",
+      "sprint": "SPR-34",
+      "assignee": "priya",
+      "story_points": 5,
+      "labels": [
+        "observability",
+        "handoff",
+        "quality"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-30T08:22:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-30T08:40:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:15:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-04T11:00:00-08:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-11-05T14:40:00-08:00",
+          "actor": "alex"
+        }
+      ],
+      "acceptance_criteria": [
+        "Reasoning view shows tool calls, inputs (masked), and outputs with timestamps.",
+        "Sensitive fields are redacted according to policy and access is role-gated.",
+        "Negative sentiment score above threshold triggers handoff within \u2264 30 seconds.",
+        "Manual 'talk to agent' always overrides automation and preserves transcript.",
+        "Given I am a supervisor with required permissions, when I see bot confidence scores during conversations, then the result supports: I can trigger timely agent takeovers.",
+        "Error states are documented and return actionable messages without leaking internal details."
+      ]
+    },
+    {
+      "id": "TBOT-2105",
+      "type": "Story",
+      "story": "As a customer, I can update my shipping address during chat, so that deliveries reach the correct location.",
+      "sprint": "SPR-34",
+      "assignee": "mike",
+      "story_points": 8,
+      "labels": [
+        "orders",
+        "address",
+        "tools"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-31T09:40:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-31T10:00:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:18:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-04T09:35:00-08:00",
+          "actor": "mike"
+        }
+      ],
+      "acceptance_criteria": [
+        "Order lookup supports ID and email+postcode fallback with masked PII.",
+        "When an order is not found, user gets a non-leaking error and an offer to escalate.",
+        "Only approved tools are callable; unapproved calls are blocked and logged.",
+        "Every tool call is auditable with actor, timestamp, params (masked), and outcome.",
+        "Given I am a customer with required permissions, when I update my shipping address during chat, then the result supports: deliveries reach the correct location.",
+        "Error states are documented and return actionable messages without leaking internal details."
+      ]
+    },
+    {
+      "id": "TBOT-2106",
+      "type": "Story",
+      "story": "As a support agent, I can generate an RMA label from chat, so that customers can return items without delay.",
+      "sprint": "SPR-34",
+      "assignee": "alex",
+      "story_points": 8,
+      "labels": [
+        "rma",
+        "tools",
+        "logistics"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-27T11:30:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-27T11:45:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:20:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-03T14:22:00-08:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "Blocked",
+          "ts": "2025-11-04T10:10:00-08:00",
+          "actor": "alex",
+          "note": "Carrier API sandbox outage"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-04T12:05:00-08:00",
+          "actor": "alex"
+        }
+      ]
+    },
+    {
+      "id": "TBOT-2107",
+      "type": "Story",
+      "story": "As a customer, I can start chat from an SMS link and continue on web with context preserved, so that I don\u2019t lose progress.",
+      "sprint": "SPR-34",
+      "assignee": "tom",
+      "story_points": 5,
+      "labels": [
+        "sessions",
+        "handoff",
+        "sms"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-28T15:05:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-28T15:30:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:22:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-04T13:10:00-08:00",
+          "actor": "tom"
+        }
+      ],
+      "acceptance_criteria": [
+        "Negative sentiment score above threshold triggers handoff within \u2264 30 seconds.",
+        "Manual 'talk to agent' always overrides automation and preserves transcript.",
+        "Session context survives channel switch (SMS\u2194Web) within a 1-hour window.",
+        "If context is stale, the user is prompted to re-authenticate gracefully.",
+        "Given I am a customer with required permissions, when I start chat from an SMS link and continue on web with context preserved, then the result supports: I don\u2019t lose progress.",
+        "Error states are documented and return actionable messages without leaking internal details."
+      ]
+    },
+    {
+      "id": "TBOT-2108",
+      "type": "Story",
+      "story": "As a customer, I can log in with a magic link email, so that I avoid passwords during support chats.",
+      "sprint": "SPR-34",
+      "assignee": "jules",
+      "story_points": 3,
+      "labels": [
+        "auth",
+        "email",
+        "onboarding"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-29T10:12:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-29T10:35:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-03T09:25:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-04T12:40:00-08:00",
+          "actor": "jules"
+        }
+      ],
+      "acceptance_criteria": [
+        "OTP is 6 digits with expiry \u2264 10 minutes; expired or wrong OTPs are rejected with a clear error message.",
+        "Resend is rate-limited to \u2264 3 attempts per 15 minutes per phone number.",
+        "Successful verification establishes a session linked to the customer record without exposing PII.",
+        "Email is sent within 5 minutes of chat end with correct locale and transcript.",
+        "Unsubscribe footer and support contact are included; links are valid.",
+        "Given I am a customer with required permissions, when I log in with a magic link email, then the result supports: I avoid passwords during support chats."
+      ]
+    },
+    {
+      "id": "TBOT-2903",
+      "type": "Bug",
+      "story": "Defect: Duplicate refunds triggered when a user re-submits within 5 seconds.",
+      "sprint": "SPR-34",
+      "assignee": "alex",
+      "story_points": 3,
+      "labels": [
+        "bug",
+        "refunds",
+        "idempotency"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-11-04T08:41:00-08:00",
+          "actor": "support-bot"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-11-04T08:50:00-08:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-11-04T09:00:00-08:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-11-04T09:15:00-08:00",
+          "actor": "alex"
+        }
+      ],
+      "acceptance_criteria": [
+        "Reproduction steps documented and reproducible in staging.",
+        "Fix prevents recurrence; add regression test covering the repro path.",
+        "No related metrics degrade and no new errors appear in logs at p95 over 24h.",
+        "Refund eligibility returns determination in \u2264 2s for in-policy orders.",
+        "Idempotency ensures duplicate submissions within 5s do not double-refund."
+      ]
+    },
+    {
+      "id": "TBOT-2201",
+      "type": "Story",
+      "story": "As a customer, I can initiate chat from the website widget, so that I can get help without leaving the page.",
+      "sprint": "SPR-31",
+      "assignee": "jules",
+      "story_points": 5,
+      "labels": [
+        "widget",
+        "frontend",
+        "chatbot"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-09-10T10:05:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-09-12T09:10:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-09-22T09:00:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-09-22T13:20:00-07:00",
+          "actor": "jules"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-09-24T11:05:00-07:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-09-25T09:15:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-09-29T10:30:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-09-29T12:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-09-30T09:10:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Given I am a customer with required permissions, when I initiate chat from the website widget, then the result supports: I can get help without leaving the page.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2202",
+      "type": "Story",
+      "story": "As a support manager, I can view chat transcripts in our CRM, so that agents have full context.",
+      "sprint": "SPR-31",
+      "assignee": "alex",
+      "story_points": 8,
+      "labels": [
+        "crm",
+        "integration",
+        "transcripts"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-09-11T14:20:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-09-13T10:00:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-09-22T09:05:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-09-23T10:40:00-07:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-09-26T13:15:00-07:00",
+          "actor": "mike"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-09-27T09:25:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-09-30T09:40:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-09-30T10:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-01T09:00:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Given I am a support manager with required permissions, when I view chat transcripts in our CRM, then the result supports: agents have full context.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2203",
+      "type": "Story",
+      "story": "As a customer, I can verify identity with last-4 digits and postcode, so that sensitive actions are protected.",
+      "sprint": "SPR-31",
+      "assignee": "mike",
+      "story_points": 5,
+      "labels": [
+        "auth",
+        "kba",
+        "security"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-09-08T11:35:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-09-12T11:55:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-09-22T09:08:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-09-23T13:05:00-07:00",
+          "actor": "mike"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-09-25T16:05:00-07:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-09-26T10:10:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-09-29T15:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-09-29T15:40:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-09-30T11:15:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "OTP is 6 digits with expiry \u2264 10 minutes; expired or wrong OTPs are rejected with a clear error message.",
+        "Resend is rate-limited to \u2264 3 attempts per 15 minutes per phone number.",
+        "Successful verification establishes a session linked to the customer record without exposing PII.",
+        "All PII fields are redacted in logs; access is traceable to user identity.",
+        "Data export/delete requests are fulfilled within SLA with audit trail.",
+        "Given I am a customer with required permissions, when I verify identity with last-4 digits and postcode, then the result supports: sensitive actions are protected."
+      ]
+    },
+    {
+      "id": "TBOT-2204",
+      "type": "Story",
+      "story": "As a security officer, I can view an audit log of bot tool calls, so that I can investigate misuse.",
+      "sprint": "SPR-31",
+      "assignee": "diego",
+      "story_points": 3,
+      "labels": [
+        "audit",
+        "security",
+        "observability"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-09-09T09:12:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-09-12T09:30:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-09-22T09:12:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-09-24T09:40:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-09-25T14:05:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-09-28T11:30:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-09-28T12:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-09-28T12:20:00-07:00",
+          "actor": "sara"
+        }
+      ]
+    },
+    {
+      "id": "TBOT-2205",
+      "type": "Story",
+      "story": "As a customer, I can receive an email transcript after chat, so that I can refer back to the steps.",
+      "sprint": "SPR-32",
+      "assignee": "jules",
+      "story_points": 5,
+      "labels": [
+        "email",
+        "transcripts",
+        "ux"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-09-30T14:18:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-02T09:00:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-06T09:02:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-06T13:30:00-07:00",
+          "actor": "jules"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-10-08T11:10:00-07:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-09T10:05:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-12T09:35:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-12T10:10:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-12T10:30:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Email is sent within 5 minutes of chat end with correct locale and transcript.",
+        "Unsubscribe footer and support contact are included; links are valid.",
+        "Given I am a customer with required permissions, when I receive an email transcript after chat, then the result supports: I can refer back to the steps.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2206",
+      "type": "Story",
+      "story": "As a support manager, I can configure business hours, so that the bot changes behavior out of hours.",
+      "sprint": "SPR-32",
+      "assignee": "sam",
+      "story_points": 3,
+      "labels": [
+        "policy",
+        "business-hours",
+        "routing"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-01T09:40:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-02T10:05:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-06T09:05:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-07T10:22:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-08T15:05:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-09T09:35:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-09T10:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-09T10:20:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Negative sentiment score above threshold triggers handoff within \u2264 30 seconds.",
+        "Manual 'talk to agent' always overrides automation and preserves transcript.",
+        "Given I am a support manager with required permissions, when I configure business hours, then the result supports: the bot changes behavior out of hours.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2207",
+      "type": "Story",
+      "story": "As a customer, I can retrieve an order using email and postcode, so that I can get help without logging in.",
+      "sprint": "SPR-32",
+      "assignee": "mike",
+      "story_points": 8,
+      "labels": [
+        "orders",
+        "lookup",
+        "api"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-09-29T12:18:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-01T09:00:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-06T09:07:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-06T14:10:00-07:00",
+          "actor": "mike"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-10-08T16:35:00-07:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-09T11:05:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-13T09:45:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-13T10:20:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-13T10:45:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Order lookup supports ID and email+postcode fallback with masked PII.",
+        "When an order is not found, user gets a non-leaking error and an offer to escalate.",
+        "Given I am a customer with required permissions, when I retrieve an order using email and postcode, then the result supports: I can get help without logging in.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2208",
+      "type": "Story",
+      "story": "As a knowledge manager, I can bulk import KB articles, so that the bot answers from the latest content.",
+      "sprint": "SPR-32",
+      "assignee": "priya",
+      "story_points": 5,
+      "labels": [
+        "kb",
+        "sync",
+        "cms"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-09-28T09:35:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-01T10:05:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-06T09:12:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-07T11:35:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-08T16:10:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-10T09:35:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-10T10:10:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-10T10:30:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Answers cite the KB article ID and last-updated date in metadata.",
+        "Outdated articles (>30 days) are flagged for review in logs.",
+        "Given I am a knowledge manager with required permissions, when I bulk import KB articles, then the result supports: the bot answers from the latest content.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2209",
+      "type": "Story",
+      "story": "As a customer, I can get return policy answers sourced from the KB, so that I understand options without waiting.",
+      "sprint": "SPR-33",
+      "assignee": "jules",
+      "story_points": 3,
+      "labels": [
+        "kb",
+        "nlp",
+        "ux"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-10T11:22:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-16T10:05:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-20T09:02:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-21T10:30:00-07:00",
+          "actor": "jules"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-10-22T11:05:00-07:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-22T14:35:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-23T10:40:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-23T11:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-23T11:20:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Answers cite the KB article ID and last-updated date in metadata.",
+        "Outdated articles (>30 days) are flagged for review in logs.",
+        "Given I am a customer with required permissions, when I get return policy answers sourced from the KB, then the result supports: I understand options without waiting.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2210",
+      "type": "Story",
+      "story": "As a support manager, I can see a deflection metrics dashboard, so that I can track FCR improvements.",
+      "sprint": "SPR-33",
+      "assignee": "alex",
+      "story_points": 8,
+      "labels": [
+        "analytics",
+        "dashboard",
+        "fcr"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-12T10:05:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-16T10:20:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-20T09:05:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-20T14:22:00-07:00",
+          "actor": "alex"
+        },
+        {
+          "stage": "Code Review",
+          "ts": "2025-10-22T16:05:00-07:00",
+          "actor": "mike"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-23T11:05:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-24T10:40:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-24T11:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-24T11:20:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Metrics reflect events within 5 minutes (p95) of occurrence.",
+        "Dashboard filters by date range, channel, and locale; exports CSV.",
+        "Given I am a support manager with required permissions, when I see a deflection metrics dashboard, then the result supports: I can track FCR improvements.",
+        "Error states are documented and return actionable messages without leaking internal details.",
+        "Telemetry logs success/failure events with correlation IDs."
+      ]
+    },
+    {
+      "id": "TBOT-2211",
+      "type": "Story",
+      "story": "As a customer, I can receive rich messages (images, links) in chat, so that support steps are clearer.",
+      "sprint": "SPR-33",
+      "assignee": "jules",
+      "story_points": 5,
+      "labels": [
+        "rich-messages",
+        "frontend",
+        "ux"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-11T15:05:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-16T10:25:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-20T09:12:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-21T11:20:00-07:00",
+          "actor": "jules"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-22T13:15:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-23T16:40:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-23T17:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-24T09:00:00-07:00",
+          "actor": "sara"
+        }
+      ]
+    },
+    {
+      "id": "TBOT-2212",
+      "type": "Story",
+      "story": "As an operations analyst, I can view daily first-contact resolution rate, so that I can assess bot impact.",
+      "sprint": "SPR-33",
+      "assignee": "diego",
+      "story_points": 3,
+      "labels": [
+        "analytics",
+        "metrics",
+        "dashboard"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-13T10:10:00-07:00",
+          "actor": "sam"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-16T10:30:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-20T09:18:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-22T09:40:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-23T11:05:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-23T16:40:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-23T17:05:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-24T09:00:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Metrics reflect events within 5 minutes (p95) of occurrence.",
+        "Dashboard filters by date range, channel, and locale; exports CSV.",
+        "Acceptance tests cover happy path and at least two edge cases.",
+        "Accessibility: feature meets WCAG AA for keyboard and screen readers."
+      ]
+    },
+    {
+      "id": "TBOT-2910",
+      "type": "Bug",
+      "story": "Defect: SLA timer displayed wrong timezone for EU customers.",
+      "sprint": "SPR-32",
+      "assignee": "priya",
+      "story_points": 2,
+      "labels": [
+        "bug",
+        "timezone",
+        "sla"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-07T08:31:00-07:00",
+          "actor": "support-bot"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-07T08:45:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-08T09:00:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-08T11:15:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-08T15:31:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-09T09:20:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-09T09:50:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-09T10:05:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Reproduction steps documented and reproducible in staging.",
+        "Fix prevents recurrence; add regression test covering the repro path.",
+        "No related metrics degrade and no new errors appear in logs at p95 over 24h."
+      ]
+    },
+    {
+      "id": "TBOT-2911",
+      "type": "Bug",
+      "story": "Defect: Live agent request button failed on Safari 16.",
+      "sprint": "SPR-33",
+      "assignee": "jules",
+      "story_points": 3,
+      "labels": [
+        "bug",
+        "frontend",
+        "handoff"
+      ],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {
+          "stage": "Created",
+          "ts": "2025-10-20T13:31:00-07:00",
+          "actor": "support-bot"
+        },
+        {
+          "stage": "Backlog",
+          "ts": "2025-10-20T13:45:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "Ready for Dev",
+          "ts": "2025-10-21T09:00:00-07:00",
+          "actor": "sara"
+        },
+        {
+          "stage": "In Development",
+          "ts": "2025-10-21T11:18:00-07:00",
+          "actor": "jules"
+        },
+        {
+          "stage": "In Testing",
+          "ts": "2025-10-21T15:05:00-07:00",
+          "actor": "priya"
+        },
+        {
+          "stage": "Ready for Deploy",
+          "ts": "2025-10-22T09:20:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Deployed",
+          "ts": "2025-10-22T09:45:00-07:00",
+          "actor": "diego"
+        },
+        {
+          "stage": "Done",
+          "ts": "2025-10-22T10:05:00-07:00",
+          "actor": "sara"
+        }
+      ],
+      "acceptance_criteria": [
+        "Reproduction steps documented and reproducible in staging.",
+        "Fix prevents recurrence; add regression test covering the repro path.",
+        "No related metrics degrade and no new errors appear in logs at p95 over 24h.",
+        "Negative sentiment score above threshold triggers handoff within \u2264 30 seconds.",
+        "Manual 'talk to agent' always overrides automation and preserves transcript."
+      ]
+    }
+  ]
+}

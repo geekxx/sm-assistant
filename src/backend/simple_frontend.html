@@ -438,6 +438,7 @@
 
     <script>
         let isLoading = false;
+        let sessionId = null;
 
         // Improved markdown to HTML converter
         function formatMarkdown(text) {
@@ -577,6 +578,11 @@
             chatArea.scrollTop = chatArea.scrollHeight;
 
             try {
+                // Initialize session if not already done
+                if (!sessionId) {
+                    await initializeSession();
+                }
+
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
@@ -584,11 +590,17 @@
                     },
                     body: JSON.stringify({
                         message: message,
-                        agent_type: agentSelect.value
+                        agent_type: agentSelect.value,
+                        session_id: sessionId
                     })
                 });
 
                 const data = await response.json();
+
+                // Update session ID if provided
+                if (data.session_id) {
+                    sessionId = data.session_id;
+                }
 
                 // Remove loading
                 chatArea.removeChild(loadingDiv);
@@ -633,6 +645,20 @@
             this.style.height = 'auto';
             this.style.height = this.scrollHeight + 'px';
         });
+
+        // Session management
+        async function initializeSession() {
+            if (!sessionId) {
+                try {
+                    const response = await fetch('/api/session/new');
+                    const data = await response.json();
+                    sessionId = data.session_id;
+                    console.log('Session initialized:', sessionId);
+                } catch (error) {
+                    console.error('Failed to initialize session:', error);
+                }
+            }
+        }
 
         // File upload functionality
         let currentFileContent = null;
@@ -688,6 +714,11 @@
         async function handleFileUpload(file) {
             clearFileError();
             
+            // Initialize session if needed
+            if (!sessionId) {
+                await initializeSession();
+            }
+            
             // Show loading in drop zone
             const dropZone = document.getElementById('fileDropZone');
             const originalContent = dropZone.innerHTML;
@@ -699,6 +730,9 @@
             try {
                 const formData = new FormData();
                 formData.append('file', file);
+                if (sessionId) {
+                    formData.append('session_id', sessionId);
+                }
 
                 const response = await fetch('/api/upload', {
                     method: 'POST',
@@ -708,6 +742,11 @@
                 const result = await response.json();
 
                 if (result.success) {
+                    // Update session ID if provided
+                    if (result.session_id) {
+                        sessionId = result.session_id;
+                    }
+                    
                     showFilePreview(result);
                     currentFileContent = result.full_content;
                     currentFileName = result.filename;
@@ -798,6 +837,7 @@
 
         // Initialize
         checkStatus();
+        initializeSession();
         document.getElementById('messageInput').focus();
     </script>
 </body>

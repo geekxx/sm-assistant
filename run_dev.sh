@@ -4,13 +4,8 @@ set -e
 echo "🚀 Starting Scrum Master Assistant Development Environment"
 echo "=================================================="
 
-# Activate virtual environment
-echo "📦 Activating virtual environment..."
-source venv/bin/activate
-
-# Export environment variables
-echo "🔧 Loading environment variables..."
-export $(grep -v '^#' .env | xargs)
+# Load environment variables (python-dotenv handles this automatically)
+echo "🔧 Environment variables will be loaded automatically..."
 
 echo "🧠 Available Azure OpenAI Models:"
 echo "  - gpt-4.1 (primary, 850 capacity)"
@@ -21,7 +16,7 @@ echo ""
 
 # Test Azure OpenAI connection
 echo "🔍 Testing Azure OpenAI connection..."
-python -c "
+python3 -c "
 import os
 import asyncio
 from openai import AsyncAzureOpenAI
@@ -53,10 +48,11 @@ if __name__ == '__main__':
 
 echo ""
 echo "🎯 Starting Backend API Server..."
-echo "Backend will be available at: http://localhost:8000"
-echo "API Documentation: http://localhost:8000/docs"
+echo "Backend will be available at: http://localhost:8005"
+echo "API Documentation: http://localhost:8005/docs"
+echo "Frontend Interface: http://localhost:8005"
 echo ""
 
-# Start the FastAPI backend
+# Start the FastAPI backend with our current main file
 cd src/backend
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+python3 main_simple_api.py

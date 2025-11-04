@@ -787,17 +787,4 @@
       "cycle_time_days": null,
       "lead_time_days": null
     }
-  ],
-  "summary_metrics": {
-    "total_stories": 35,
-    "total_defects": 6,
-    "completed_items": 21,
-    "in_progress_items": 10,
-    "backlog_items": 5,
-    "ready_items": 5,
-    "average_cycle_time_days": 6.7,
-    "average_lead_time_days": 10.8,
-    "throughput_per_week": 5.25,
-    "defect_rate_percent": 14.6
-  }
 }
