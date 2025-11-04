@@ -1,0 +1,595 @@
+{
+  "team": "Thunderbolt",
+  "generated_at": "2025-11-03T14:00:00-08:00",
+  "sprints": [
+    {
+      "sprint_id": "SPR-34",
+      "name": "Thunderbolt Sprint 34",
+      "start_date": "2025-11-03",
+      "end_date": "2025-11-14",
+      "goal": "Demo overage events with dashboard stub; stabilize e2e tests"
+    },
+    {
+      "sprint_id": "SPR-35",
+      "name": "Thunderbolt Sprint 35",
+      "start_date": "2025-11-17",
+      "end_date": "2025-11-28",
+      "goal": "Productionize overage aggregation; reduce test flakiness by 50%"
+    }
+  ],
+  "epics": [
+    {
+      "key": "THUN-100",
+      "type": "Epic",
+      "summary": "Usage Limits & Overage Visibility",
+      "status": "In Progress",
+      "owner": "sam",
+      "labels": ["usage-limits", "overage"],
+      "target_sprint": "SPR-34"
+    },
+    {
+      "key": "THUN-101",
+      "type": "Epic",
+      "summary": "Improve Pipeline Stability",
+      "status": "In Progress",
+      "owner": "sara",
+      "labels": ["ci", "stability"],
+      "target_sprint": "SPR-34"
+    },
+    {
+      "key": "THUN-102",
+      "type": "Epic",
+      "summary": "CSV Export for Billing",
+      "status": "Backlog",
+      "owner": "sam",
+      "labels": ["billing"],
+      "target_sprint": "SPR-35",
+      "notes": "Deprioritized this sprint; swapped out for overage work."
+    },
+    {
+      "key": "THUN-103",
+      "type": "Epic",
+      "summary": "Team Wellness & Working Agreements",
+      "status": "In Progress",
+      "owner": "sara",
+      "labels": ["process", "wellness"],
+      "target_sprint": "SPR-35"
+    }
+  ],
+  "issues": [
+    {
+      "key": "THUN-110",
+      "type": "Feature",
+      "summary": "Overage Event Stream & Nightly Aggregation",
+      "status": "In Progress",
+      "epic_link": "THUN-100",
+      "assignee": "alex",
+      "priority": "P1",
+      "story_points": 8,
+      "sprint": "SPR-34",
+      "labels": ["backend", "events"]
+    },
+    {
+      "key": "THUN-111",
+      "type": "Feature",
+      "summary": "Settings UI Updates for Usage Limits",
+      "status": "In Progress",
+      "epic_link": "THUN-100",
+      "assignee": "jules",
+      "priority": "P2",
+      "story_points": 5,
+      "sprint": "SPR-34",
+      "labels": ["frontend", "ui"]
+    },
+    {
+      "key": "THUN-120",
+      "type": "Feature",
+      "summary": "Deterministic Test Data Seeding",
+      "status": "To Do",
+      "epic_link": "THUN-101",
+      "assignee": "priya",
+      "priority": "P1",
+      "story_points": 5,
+      "sprint": "SPR-34",
+      "labels": ["ci", "testing"]
+    },
+    {
+      "key": "THUN-121",
+      "type": "Feature",
+      "summary": "Integration Test Flakiness Reduction",
+      "status": "In Progress",
+      "epic_link": "THUN-101",
+      "assignee": "priya",
+      "priority": "P1",
+      "story_points": 8,
+      "sprint": "SPR-34",
+      "labels": ["e2e", "flaky-test"]
+    },
+    {
+      "key": "THUN-130",
+      "type": "Feature",
+      "summary": "Billing CSV Export MVP",
+      "status": "Backlog",
+      "epic_link": "THUN-102",
+      "assignee": "sam",
+      "priority": "P2",
+      "story_points": null,
+      "sprint": null,
+      "labels": ["billing", "mvp"],
+      "flags": { "unestimated": true }
+    },
+
+    // --- Stories / Tasks / Bugs ---
+
+    {
+      "key": "THUN-200",
+      "type": "Story",
+      "summary": "Emit `usage_exceeded` event from gateway",
+      "status": "In Progress",
+      "epic_link": "THUN-100",
+      "parent": "THUN-110",
+      "assignee": "mike",
+      "priority": "P1",
+      "story_points": 5,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "Event `usage_exceeded{user_id, plan_id, ts}` emitted when usage crosses threshold",
+        "Event schema documented in /docs/events/usage_exceeded.md",
+        "Unit & contract tests covering threshold and edge cases"
+      ],
+      "labels": ["backend", "events"]
+    },
+    {
+      "key": "THUN-201",
+      "type": "Story",
+      "summary": "Nightly aggregation job to count overages by user & plan",
+      "status": "Code Review",
+      "epic_link": "THUN-100",
+      "parent": "THUN-110",
+      "assignee": "mike",
+      "priority": "P1",
+      "story_points": 8,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "Job runs at 02:00 PT and produces counts to S3 partitioned by date",
+        "Observability: logs, metrics, and alert on failure",
+        "Backfills no more than 3 days if lag detected"
+      ],
+      "blocks": ["THUN-205"],
+      "blocked_by": ["THUN-200"],
+      "labels": ["backend", "batch"]
+    },
+    {
+      "key": "THUN-202",
+      "type": "Task",
+      "summary": "Create S3 bucket & IAM for aggregation outputs",
+      "status": "Done",
+      "epic_link": "THUN-100",
+      "parent": "THUN-110",
+      "assignee": "diego",
+      "priority": "P2",
+      "story_points": 3,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "S3 bucket with lifecycle policy (30 days)",
+        "Least-privilege IAM role for writer/reader",
+        "Terraform applied; outputs documented"
+      ],
+      "labels": ["sre", "infra"]
+    },
+    {
+      "key": "THUN-203",
+      "type": "Bug",
+      "summary": "GC pause on app-4 causing rate limiter hiccup (60s 5XX spike)",
+      "status": "To Do",
+      "epic_link": "THUN-100",
+      "parent": "THUN-110",
+      "assignee": "diego",
+      "priority": "P0",
+      "story_points": 5,
+      "sprint": "SPR-34",
+      "repro_steps": "Burst of large payloads triggers GC pause; see 18:39–18:40 logs",
+      "labels": ["perf", "incident"],
+      "flags": { "policy_violation": "bugs-should-not-have-story-points" }
+    },
+    {
+      "key": "THUN-204",
+      "type": "Story",
+      "summary": "Dashboard stub: overage sparkline (sample data)",
+      "status": "Done",
+      "epic_link": "THUN-100",
+      "parent": "THUN-110",
+      "assignee": "jules",
+      "priority": "P3",
+      "story_points": 2,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "Sparkline renders with static sample data labeled 'sample'",
+        "Feature flagged off for non-demo environments",
+        "A11y: chart has accessible label"
+      ],
+      "labels": ["frontend", "demo"]
+    },
+    {
+      "key": "THUN-205",
+      "type": "Story",
+      "summary": "Backfill historical overage events (last 14 days)",
+      "status": "To Do",
+      "epic_link": "THUN-100",
+      "parent": "THUN-110",
+      "assignee": "alex",
+      "priority": "P2",
+      "story_points": 13,
+      "sprint": "SPR-35",
+      "acceptance_criteria": [
+        "Backfill job replays events from raw logs without double counting",
+        "Backfill can be re-run idempotently",
+        "Runbook updated"
+      ],
+      "blocked_by": ["THUN-201"],
+      "labels": ["backend", "batch"]
+    },
+
+    {
+      "key": "THUN-210",
+      "type": "Story",
+      "summary": "Settings page: connect to Usage Limits API",
+      "status": "Done",
+      "epic_link": "THUN-100",
+      "parent": "THUN-111",
+      "assignee": "jules",
+      "priority": "P2",
+      "story_points": 5,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "Settings reads/writes limit values via /v2/limits",
+        "Error states & empty states per design",
+        "Contract tests pass"
+      ],
+      "labels": ["frontend", "a11y"]
+    },
+    {
+      "key": "THUN-211",
+      "type": "Story",
+      "summary": "Responsive empty states & skeleton loaders",
+      "status": "In Progress",
+      "epic_link": "THUN-100",
+      "parent": "THUN-111",
+      "assignee": "jules",
+      "priority": "P3",
+      "story_points": null,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [],
+      "labels": ["frontend", "ui"],
+      "flags": { "unestimated": true, "missing_ac": true }
+    },
+
+    {
+      "key": "THUN-220",
+      "type": "Story",
+      "summary": "Add 'data seeding' pipeline step before e2e",
+      "status": "To Do",
+      "epic_link": "THUN-101",
+      "parent": "THUN-120",
+      "assignee": "priya",
+      "priority": "P1",
+      "story_points": 3,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [],
+      "labels": ["ci", "pipeline"],
+      "flags": { "missing_ac": true }
+    },
+    {
+      "key": "THUN-221",
+      "type": "Story",
+      "summary": "Seed accounts covering trial/paid/enterprise states",
+      "status": "To Do",
+      "epic_link": "THUN-101",
+      "parent": "THUN-120",
+      "assignee": "tom",
+      "priority": "P2",
+      "story_points": null,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "Fixture data loads in < 90s",
+        "Docs show how to extend with new plans"
+      ],
+      "labels": ["testing", "fixtures"],
+      "flags": { "unestimated": true }
+    },
+    {
+      "key": "THUN-222",
+      "type": "Spike",
+      "summary": "Investigate test data race conditions",
+      "status": "In Progress",
+      "epic_link": "THUN-101",
+      "parent": "THUN-121",
+      "assignee": "priya",
+      "priority": "P2",
+      "story_points": 3,
+      "sprint": "SPR-34",
+      "timebox_hours": 8,
+      "exit_criteria": [
+        "Document root cause hypotheses",
+        "Proposed mitigation plan with estimated effort"
+      ],
+      "labels": ["e2e", "investigation"]
+    },
+    {
+      "key": "THUN-230",
+      "type": "Bug",
+      "summary": "TEST-472 'Renewal flow' flaky — quarantine & fix",
+      "status": "In Progress",
+      "epic_link": "THUN-101",
+      "parent": "THUN-121",
+      "assignee": "priya",
+      "priority": "P1",
+      "story_points": null,
+      "sprint": "SPR-34",
+      "repro_steps": "Intermittent failure in step 2/4; timing dependent",
+      "labels": ["flaky-test", "e2e"],
+      "flags": { "unestimated": true }
+    },
+    {
+      "key": "THUN-231",
+      "type": "Task",
+      "summary": "Tune alert thresholds to reduce false 5XX pages",
+      "status": "To Do",
+      "epic_link": "THUN-101",
+      "parent": "THUN-121",
+      "assignee": "diego",
+      "priority": "P2",
+      "story_points": 3,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "No false positives on nightly batch",
+        "Alert fires when 5XX > baseline + 3σ for 5 min"
+      ],
+      "labels": ["sre", "observability"]
+    },
+
+    {
+      "key": "THUN-240",
+      "type": "Story",
+      "summary": "CSV export endpoint /v1/billing/export",
+      "status": "Backlog",
+      "epic_link": "THUN-102",
+      "parent": "THUN-130",
+      "assignee": "alex",
+      "priority": "P3",
+      "story_points": 13,
+      "sprint": null,
+      "acceptance_criteria": [],
+      "labels": ["backend", "billing"],
+      "flags": { "missing_ac": true }
+    },
+    {
+      "key": "THUN-241",
+      "type": "Story",
+      "summary": "Export UI: download button & status",
+      "status": "Backlog",
+      "epic_link": "THUN-102",
+      "parent": "THUN-130",
+      "assignee": null,
+      "priority": "P3",
+      "story_points": null,
+      "sprint": null,
+      "acceptance_criteria": [],
+      "labels": ["frontend", "billing"],
+      "flags": { "unassigned": true, "unestimated": true, "missing_ac": true }
+    },
+
+    // --- Orphans (no epic/parent) ---
+
+    {
+      "key": "THUN-300",
+      "type": "Story",
+      "summary": "Per-user overage cap enforcement (hard cap)",
+      "status": "In Progress",
+      "epic_link": null,
+      "parent": null,
+      "assignee": "mike",
+      "priority": "P2",
+      "story_points": 8,
+      "sprint": "SPR-35",
+      "acceptance_criteria": [
+        "Requests beyond cap return 429 with retry-after",
+        "Configurable per plan",
+        "Observability: capped count per user"
+      ],
+      "labels": ["backend", "limits"],
+      "flags": { "orphan": true },
+      "notes": "Likely belongs under THUN-100"
+    },
+    {
+      "key": "THUN-301",
+      "type": "Story",
+      "summary": "GDPR audit for `usage_events` retention",
+      "status": "To Do",
+      "epic_link": null,
+      "parent": null,
+      "assignee": "sam",
+      "priority": "P3",
+      "story_points": 3,
+      "sprint": null,
+      "acceptance_criteria": [
+        "Retention policy documented & approved by Legal",
+        "PII review completed; purge job defined if needed"
+      ],
+      "labels": ["compliance", "data"],
+      "flags": { "orphan": true }
+    },
+    {
+      "key": "THUN-302",
+      "type": "Bug",
+      "summary": "Staging JWT issuer mismatch leads to `jwt malformed`",
+      "status": "Done",
+      "epic_link": null,
+      "parent": null,
+      "assignee": "alex",
+      "priority": "P2",
+      "story_points": 1,
+      "sprint": "SPR-34",
+      "repro_steps": "Set JWT_ISS incorrectly on staging; rotate token",
+      "labels": ["auth", "staging"],
+      "flags": { "orphan": true }
+    },
+
+    // --- Process / Wellness ---
+
+    {
+      "key": "THUN-303",
+      "type": "Story",
+      "summary": "Publish acceptance-criteria template",
+      "status": "To Do",
+      "epic_link": null,
+      "parent": null,
+      "assignee": null,
+      "priority": "P2",
+      "story_points": 2,
+      "sprint": "SPR-35",
+      "acceptance_criteria": [],
+      "labels": ["process", "documentation"],
+      "flags": { "orphan": true, "unassigned": true, "missing_ac": true }
+    },
+    {
+      "key": "THUN-304",
+      "type": "Task",
+      "summary": "On-call rotation policy update in PagerDuty",
+      "status": "To Do",
+      "epic_link": "THUN-103",
+      "parent": null,
+      "assignee": "sara",
+      "priority": "P2",
+      "story_points": 1,
+      "sprint": "SPR-35",
+      "acceptance_criteria": [
+        "Backup assignee documented for each rotation",
+        "Swap procedure documented & communicated"
+      ],
+      "labels": ["process", "pagerduty"]
+    },
+    {
+      "key": "THUN-308",
+      "type": "Story",
+      "summary": "Automate merge freeze after 7 PM local time",
+      "status": "To Do",
+      "epic_link": "THUN-103",
+      "parent": null,
+      "assignee": "diego",
+      "priority": "P2",
+      "story_points": 3,
+      "sprint": "SPR-35",
+      "acceptance_criteria": [
+        "PR merges blocked after 19:00–07:00 except for approved label",
+        "Audit log of override events",
+        "Docs updated for emergency procedure"
+      ],
+      "labels": ["devex", "policy"]
+    },
+    {
+      "key": "THUN-309",
+      "type": "Story",
+      "summary": "Automate nightly merge freeze (duplicate of THUN-308)",
+      "status": "Duplicate",
+      "epic_link": "THUN-103",
+      "parent": null,
+      "assignee": null,
+      "priority": "P3",
+      "story_points": null,
+      "sprint": null,
+      "acceptance_criteria": [],
+      "labels": ["duplicate"],
+      "duplicate_of": "THUN-308",
+      "flags": { "duplicate": true, "unestimated": true, "unassigned": true }
+    },
+
+    // --- More stories for coverage ---
+
+    {
+      "key": "THUN-306",
+      "type": "Story",
+      "summary": "Contract tests for /v2/limits",
+      "status": "In Progress",
+      "epic_link": "THUN-100",
+      "parent": "THUN-110",
+      "assignee": "priya",
+      "priority": "P1",
+      "story_points": 5,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "Consumer-provider contract in CI",
+        "Breaking changes fail pipeline",
+        "Docs for adding new contracts"
+      ],
+      "labels": ["testing", "contracts"]
+    },
+    {
+      "key": "THUN-305",
+      "type": "Story",
+      "summary": "Accessibility: tooltip fixes & focus order",
+      "status": "Done",
+      "epic_link": "THUN-100",
+      "parent": "THUN-111",
+      "assignee": "jules",
+      "priority": "P3",
+      "story_points": 2,
+      "sprint": "SPR-34",
+      "acceptance_criteria": [
+        "Tooltips accessible via keyboard & screen readers",
+        "No focus traps reported by axe"
+      ],
+      "labels": ["frontend", "a11y"]
+    },
+    {
+      "key": "THUN-310",
+      "type": "Story",
+      "summary": "Doc: How to write contract tests",
+      "status": "To Do",
+      "epic_link": null,
+      "parent": null,
+      "assignee": "priya",
+      "priority": "P3",
+      "story_points": null,
+      "sprint": "SPR-35",
+      "acceptance_criteria": [
+        "Step-by-step guide added to /docs/testing/contract-tests.md",
+        "Example test linked from repo"
+      ],
+      "labels": ["documentation", "testing"],
+      "flags": { "orphan": true, "unestimated": true }
+    },
+    {
+      "key": "THUN-311",
+      "type": "Task",
+      "summary": "Create slow query log dashboard for staging",
+      "status": "To Do",
+      "epic_link": "THUN-101",
+      "parent": "THUN-121",
+      "assignee": "diego",
+      "priority": "P3",
+      "story_points": 2,
+      "sprint": "SPR-35",
+      "acceptance_criteria": [
+        "Dashboard shows top 10 slow queries by p95",
+        "Alert when p95 > 500ms for 10 min"
+      ],
+      "labels": ["observability", "staging"]
+    },
+    {
+      "key": "THUN-312",
+      "type": "Story",
+      "summary": "Trial user behavior for Usage Limits",
+      "status": "To Do",
+      "epic_link": "THUN-100",
+      "parent": "THUN-111",
+      "assignee": "sam",
+      "priority": "P2",
+      "story_points": 3,
+      "sprint": "SPR-35",
+      "acceptance_criteria": [],
+      "labels": ["product"],
+      "flags": { "missing_ac": true }
+    }
+  ]
+}

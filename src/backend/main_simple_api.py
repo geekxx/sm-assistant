@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import HTMLResponse
@@ -56,6 +56,16 @@ class ChatResponse(BaseModel):
     agent: str
     timestamp: str
     success: bool = True
+
+class FileUploadResponse(BaseModel):
+    success: bool
+    filename: str
+    content_type: str
+    file_size: int
+    preview: str
+    full_content: str
+    timestamp: str
+    error: Optional[str] = None
 
 async def initialize_openai_client() -> bool:
     """Initialize OpenAI client using API key"""
@@ -153,7 +163,78 @@ Structure your response with clear headings, bullet points, and concrete example
         }
     }
     
-    logger.info(f"✅ Loaded {len(sm_agents)} agent configurations")
+    logger.info(f"✅ Loaded {len(sm_agents)} SM agents")
+    return True
+
+async def process_uploaded_file(file: UploadFile) -> Dict[str, Any]:
+    """Process uploaded file and extract content"""
+    
+    # Allowed file extensions and MIME types
+    allowed_extensions = {'.txt', '.md', '.json', '.csv'}
+    allowed_mime_types = {
+        'text/plain', 'text/markdown', 'application/json', 
+        'text/csv', 'application/csv', 'text/x-csv'
+    }
+    
+    try:
+        # Check file extension
+        file_ext = os.path.splitext(file.filename or '')[1].lower()
+        if file_ext not in allowed_extensions:
+            return {
+                "success": False,
+                "error": f"Unsupported file type: {file_ext}. Supported: {', '.join(allowed_extensions)}"
+            }
+        
+        # Read file content
+        content_bytes = await file.read()
+        
+        # Check file size (limit to 1MB)
+        if len(content_bytes) > 1024 * 1024:  # 1MB
+            return {
+                "success": False,
+                "error": "File too large. Maximum size is 1MB."
+            }
+        
+        # Try to decode as UTF-8
+        try:
+            content = content_bytes.decode('utf-8')
+        except UnicodeDecodeError:
+            return {
+                "success": False,
+                "error": "File must be in UTF-8 encoding."
+            }
+        
+        # Create preview (first 500 characters)
+        preview = content[:500]
+        if len(content) > 500:
+            preview += "..."
+        
+        # Validate JSON if it's a JSON file
+        if file_ext == '.json':
+            try:
+                json.loads(content)
+            except json.JSONDecodeError as e:
+                return {
+                    "success": False,
+                    "error": f"Invalid JSON format: {str(e)}"
+                }
+        
+        return {
+            "success": True,
+            "filename": file.filename or "unknown",
+            "content_type": file.content_type or "unknown",
+            "file_size": len(content_bytes),
+            "preview": preview,
+            "full_content": content,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error processing file: {e}")
+        return {
+            "success": False,
+            "error": f"Error processing file: {str(e)}"
+        }
 
 async def chat_with_openai(message: str, agent_type: str = "general") -> Dict[str, Any]:
     """Chat with OpenAI using the specified agent context"""
@@ -295,6 +376,34 @@ async def list_agents():
             for k, v in sm_agents.items()
         ]
     }
+
+@app.post("/api/upload")
+async def upload_file(file: UploadFile = File(...)) -> FileUploadResponse:
+    """Handle file uploads for drag-and-drop functionality"""
+    
+    result = await process_uploaded_file(file)
+    
+    if result["success"]:
+        return FileUploadResponse(
+            success=True,
+            filename=result["filename"],
+            content_type=result["content_type"],
+            file_size=result["file_size"],
+            preview=result["preview"],
+            full_content=result["full_content"],
+            timestamp=result["timestamp"]
+        )
+    else:
+        return FileUploadResponse(
+            success=False,
+            filename="",
+            content_type="",
+            file_size=0,
+            preview="",
+            full_content="",
+            timestamp=datetime.now().isoformat(),
+            error=result["error"]
+        )
 
 # Serve simple chat frontend
 @app.get("/")

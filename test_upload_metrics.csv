@@ -1,0 +1,8 @@
+Story ID,Title,Status,Story Points,Assignee,Created Date,Completed Date,Sprint
+US-001,User Registration,Completed,5,Alice Johnson,2024-10-01,2024-10-05,Sprint 15
+US-002,Email Verification,Completed,3,Bob Smith,2024-10-01,2024-10-04,Sprint 15
+US-003,Password Reset,In Progress,5,Charlie Brown,2024-10-02,,Sprint 15
+US-004,Profile Management,To Do,8,Diana Prince,2024-10-03,,Sprint 15
+US-005,Two-Factor Auth,In Progress,8,Eve Adams,2024-10-01,,Sprint 15
+BUG-001,Login Error Handling,Completed,2,Alice Johnson,2024-10-04,2024-10-06,Sprint 15
+BUG-002,UI Responsiveness,To Do,3,Bob Smith,2024-10-05,,Sprint 15
