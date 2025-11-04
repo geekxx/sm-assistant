@@ -1,595 +1,767 @@
 {
   "team": "Thunderbolt",
-  "generated_at": "2025-11-03T14:00:00-08:00",
+  "product": "Agentic AI Customer Service Chatbot",
+  "timezone": "America/Los_Angeles",
+  "generated_at": "2025-11-04T14:30:00-08:00",
   "sprints": [
-    {
-      "sprint_id": "SPR-34",
-      "name": "Thunderbolt Sprint 34",
-      "start_date": "2025-11-03",
-      "end_date": "2025-11-14",
-      "goal": "Demo overage events with dashboard stub; stabilize e2e tests"
-    },
-    {
-      "sprint_id": "SPR-35",
-      "name": "Thunderbolt Sprint 35",
-      "start_date": "2025-11-17",
-      "end_date": "2025-11-28",
-      "goal": "Productionize overage aggregation; reduce test flakiness by 50%"
-    }
+    { "id": "SPR-31", "start_date": "2025-09-22", "end_date": "2025-10-03" },
+    { "id": "SPR-32", "start_date": "2025-10-06", "end_date": "2025-10-17" },
+    { "id": "SPR-33", "start_date": "2025-10-20", "end_date": "2025-10-31" },
+    { "id": "SPR-34", "start_date": "2025-11-03", "end_date": "2025-11-14" }
   ],
-  "epics": [
+  "note": "Per requirement, stories in Backlog have no assignee and no sprint. Stage history includes timestamps for each transition. A few Bugs are included in addition to story counts.",
+  "items": [
     {
-      "key": "THUN-100",
-      "type": "Epic",
-      "summary": "Usage Limits & Overage Visibility",
-      "status": "In Progress",
-      "owner": "sam",
-      "labels": ["usage-limits", "overage"],
-      "target_sprint": "SPR-34"
-    },
-    {
-      "key": "THUN-101",
-      "type": "Epic",
-      "summary": "Improve Pipeline Stability",
-      "status": "In Progress",
-      "owner": "sara",
-      "labels": ["ci", "stability"],
-      "target_sprint": "SPR-34"
-    },
-    {
-      "key": "THUN-102",
-      "type": "Epic",
-      "summary": "CSV Export for Billing",
-      "status": "Backlog",
-      "owner": "sam",
-      "labels": ["billing"],
-      "target_sprint": "SPR-35",
-      "notes": "Deprioritized this sprint; swapped out for overage work."
-    },
-    {
-      "key": "THUN-103",
-      "type": "Epic",
-      "summary": "Team Wellness & Working Agreements",
-      "status": "In Progress",
-      "owner": "sara",
-      "labels": ["process", "wellness"],
-      "target_sprint": "SPR-35"
-    }
-  ],
-  "issues": [
-    {
-      "key": "THUN-110",
-      "type": "Feature",
-      "summary": "Overage Event Stream & Nightly Aggregation",
-      "status": "In Progress",
-      "epic_link": "THUN-100",
-      "assignee": "alex",
-      "priority": "P1",
-      "story_points": 8,
-      "sprint": "SPR-34",
-      "labels": ["backend", "events"]
-    },
-    {
-      "key": "THUN-111",
-      "type": "Feature",
-      "summary": "Settings UI Updates for Usage Limits",
-      "status": "In Progress",
-      "epic_link": "THUN-100",
-      "assignee": "jules",
-      "priority": "P2",
-      "story_points": 5,
-      "sprint": "SPR-34",
-      "labels": ["frontend", "ui"]
-    },
-    {
-      "key": "THUN-120",
-      "type": "Feature",
-      "summary": "Deterministic Test Data Seeding",
-      "status": "To Do",
-      "epic_link": "THUN-101",
-      "assignee": "priya",
-      "priority": "P1",
-      "story_points": 5,
-      "sprint": "SPR-34",
-      "labels": ["ci", "testing"]
-    },
-    {
-      "key": "THUN-121",
-      "type": "Feature",
-      "summary": "Integration Test Flakiness Reduction",
-      "status": "In Progress",
-      "epic_link": "THUN-101",
-      "assignee": "priya",
-      "priority": "P1",
-      "story_points": 8,
-      "sprint": "SPR-34",
-      "labels": ["e2e", "flaky-test"]
-    },
-    {
-      "key": "THUN-130",
-      "type": "Feature",
-      "summary": "Billing CSV Export MVP",
-      "status": "Backlog",
-      "epic_link": "THUN-102",
-      "assignee": "sam",
-      "priority": "P2",
-      "story_points": null,
+      "id": "TBOT-2001",
+      "type": "Story",
+      "story": "As a customer, I can authenticate with a one-time SMS code, so that I can securely chat without creating an account.",
       "sprint": null,
-      "labels": ["billing", "mvp"],
-      "flags": { "unestimated": true }
-    },
-
-    // --- Stories / Tasks / Bugs ---
-
-    {
-      "key": "THUN-200",
-      "type": "Story",
-      "summary": "Emit `usage_exceeded` event from gateway",
-      "status": "In Progress",
-      "epic_link": "THUN-100",
-      "parent": "THUN-110",
-      "assignee": "mike",
-      "priority": "P1",
+      "assignee": null,
       "story_points": 5,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "Event `usage_exceeded{user_id, plan_id, ts}` emitted when usage crosses threshold",
-        "Event schema documented in /docs/events/usage_exceeded.md",
-        "Unit & contract tests covering threshold and edge cases"
-      ],
-      "labels": ["backend", "events"]
+      "labels": ["auth", "onboarding", "chatbot"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-28T10:08:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-28T10:35:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:00:00-08:00", "actor": "sara"}
+      ]
     },
     {
-      "key": "THUN-201",
+      "id": "TBOT-2002",
       "type": "Story",
-      "summary": "Nightly aggregation job to count overages by user & plan",
-      "status": "Code Review",
-      "epic_link": "THUN-100",
-      "parent": "THUN-110",
-      "assignee": "mike",
-      "priority": "P1",
+      "story": "As a support manager, I can configure escalation rules based on keywords and sentiment, so that conversations hand off to humans at the right time.",
+      "sprint": null,
+      "assignee": null,
       "story_points": 8,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "Job runs at 02:00 PT and produces counts to S3 partitioned by date",
-        "Observability: logs, metrics, and alert on failure",
-        "Backfills no more than 3 days if lag detected"
-      ],
-      "blocks": ["THUN-205"],
-      "blocked_by": ["THUN-200"],
-      "labels": ["backend", "batch"]
+      "labels": ["routing", "sentiment", "policy"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-29T09:20:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-29T09:40:00-07:00", "actor": "sara"}
+      ]
     },
     {
-      "key": "THUN-202",
-      "type": "Task",
-      "summary": "Create S3 bucket & IAM for aggregation outputs",
-      "status": "Done",
-      "epic_link": "THUN-100",
-      "parent": "THUN-110",
-      "assignee": "diego",
-      "priority": "P2",
-      "story_points": 3,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "S3 bucket with lifecycle policy (30 days)",
-        "Least-privilege IAM role for writer/reader",
-        "Terraform applied; outputs documented"
-      ],
-      "labels": ["sre", "infra"]
+      "id": "TBOT-2003",
+      "type": "Story",
+      "story": "As a customer, I can switch languages mid-conversation, so that I can get help in my preferred language.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": ["i18n", "nlp", "multilingual"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-27T14:18:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-27T14:35:00-07:00", "actor": "sara"}
+      ]
     },
     {
-      "key": "THUN-203",
-      "type": "Bug",
-      "summary": "GC pause on app-4 causing rate limiter hiccup (60s 5XX spike)",
-      "status": "To Do",
-      "epic_link": "THUN-100",
-      "parent": "THUN-110",
-      "assignee": "diego",
-      "priority": "P0",
+      "id": "TBOT-2004",
+      "type": "Story",
+      "story": "As a support agent, I can view the bot’s reasoning trace and tool calls, so that I can audit and correct decisions.",
+      "sprint": null,
+      "assignee": null,
       "story_points": 5,
-      "sprint": "SPR-34",
-      "repro_steps": "Burst of large payloads triggers GC pause; see 18:39–18:40 logs",
-      "labels": ["perf", "incident"],
-      "flags": { "policy_violation": "bugs-should-not-have-story-points" }
+      "labels": ["observability", "explainability", "agent"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-30T11:12:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-30T11:30:00-07:00", "actor": "sara"}
+      ]
     },
     {
-      "key": "THUN-204",
+      "id": "TBOT-2005",
       "type": "Story",
-      "summary": "Dashboard stub: overage sparkline (sample data)",
-      "status": "Done",
-      "epic_link": "THUN-100",
-      "parent": "THUN-110",
-      "assignee": "jules",
-      "priority": "P3",
-      "story_points": 2,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "Sparkline renders with static sample data labeled 'sample'",
-        "Feature flagged off for non-demo environments",
-        "A11y: chart has accessible label"
-      ],
-      "labels": ["frontend", "demo"]
+      "story": "As a customer, I can upload a screenshot of an error, so that the assistant can diagnose my issue faster.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": ["vision", "attachments", "ux"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-31T10:05:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-31T10:22:00-07:00", "actor": "sara"}
+      ]
     },
     {
-      "key": "THUN-205",
+      "id": "TBOT-2006",
       "type": "Story",
-      "summary": "Backfill historical overage events (last 14 days)",
-      "status": "To Do",
-      "epic_link": "THUN-100",
-      "parent": "THUN-110",
-      "assignee": "alex",
-      "priority": "P2",
+      "story": "As a support manager, I can define allowed tools (refund, RMA, order lookup), so that the bot executes authorized actions safely.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": ["tools", "governance", "safety"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-28T13:15:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-28T13:40:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-01T09:10:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2007",
+      "type": "Story",
+      "story": "As a customer, I can request a live agent at any time, so that I never feel trapped in automation.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": ["handoff", "ux", "routing"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-26T15:05:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-26T15:25:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2008",
+      "type": "Story",
+      "story": "As a support manager, I can A/B test prompt templates, so that we increase first-contact resolution.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": ["experimentation", "prompts", "analytics"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-01T10:40:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-11-01T11:00:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2009",
+      "type": "Story",
+      "story": "As a customer, I can see proactive shipping delay notifications in chat, so that I know what to expect.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": ["events", "notifications", "logistics"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-27T09:35:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-27T09:55:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2010",
+      "type": "Story",
+      "story": "As a compliance officer, I can review PII redaction logs, so that we meet GDPR obligations.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": ["gdpr", "pii", "security"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-30T14:05:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-30T14:20:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2011",
+      "type": "Story",
+      "story": "As a customer, I can resume a previous conversation, so that I don’t have to repeat myself.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": ["sessions", "memory", "chatbot"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-25T11:18:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-25T11:35:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2012",
+      "type": "Story",
+      "story": "As a support manager, I can set SLAs for response time and escalation, so that service meets policy targets.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": ["sla", "policy", "routing"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-02T09:10:00-08:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-11-02T09:25:00-08:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2013",
+      "type": "Story",
+      "story": "As a customer, I can receive step-by-step troubleshooting flows, so that I can self-serve common issues.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": ["guided-flows", "kb", "ux"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-03T08:50:00-08:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-11-03T09:05:00-08:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2014",
+      "type": "Story",
+      "story": "As a support agent, I can rate bot handoffs, so that the model learns from real outcomes.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": ["feedback", "learning", "handoff"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-01T12:30:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-11-01T12:44:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2015",
+      "type": "Story",
+      "story": "As a localization lead, I can manage glossaries per locale, so that brand terms stay consistent.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 3,
+      "labels": ["i18n", "glossary", "quality"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-24T15:50:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-24T16:05:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2016",
+      "type": "Story",
+      "story": "As a customer, I can check refund eligibility instantly, so that I know my options before contacting an agent.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": ["refunds", "policy", "tools"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-23T09:15:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-23T09:35:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2017",
+      "type": "Story",
+      "story": "As a security engineer, I can approve third-party integrations, so that the bot only uses trusted tools.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 5,
+      "labels": ["security", "integrations", "governance"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-22T11:10:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-22T11:35:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2018",
+      "type": "Story",
+      "story": "As a customer, I can pay invoices in chat via secure checkout, so that billing issues are resolved faster.",
+      "sprint": null,
+      "assignee": null,
       "story_points": 13,
-      "sprint": "SPR-35",
-      "acceptance_criteria": [
-        "Backfill job replays events from raw logs without double counting",
-        "Backfill can be re-run idempotently",
-        "Runbook updated"
-      ],
-      "blocked_by": ["THUN-201"],
-      "labels": ["backend", "batch"]
+      "labels": ["payments", "pci", "billing"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-02T13:05:00-08:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-11-02T13:20:00-08:00", "actor": "sara"}
+      ]
     },
-
     {
-      "key": "THUN-210",
+      "id": "TBOT-2019",
       "type": "Story",
-      "summary": "Settings page: connect to Usage Limits API",
-      "status": "Done",
-      "epic_link": "THUN-100",
-      "parent": "THUN-111",
-      "assignee": "jules",
-      "priority": "P2",
+      "story": "As a knowledge manager, I can sync FAQs from our CMS, so that the bot answers from the latest content.",
+      "sprint": null,
+      "assignee": null,
       "story_points": 5,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "Settings reads/writes limit values via /v2/limits",
-        "Error states & empty states per design",
-        "Contract tests pass"
-      ],
-      "labels": ["frontend", "a11y"]
+      "labels": ["kb", "sync", "cms"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-03T11:22:00-08:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-11-03T11:40:00-08:00", "actor": "sara"}
+      ]
     },
     {
-      "key": "THUN-211",
+      "id": "TBOT-2020",
       "type": "Story",
-      "summary": "Responsive empty states & skeleton loaders",
-      "status": "In Progress",
-      "epic_link": "THUN-100",
-      "parent": "THUN-111",
-      "assignee": "jules",
-      "priority": "P3",
-      "story_points": null,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [],
-      "labels": ["frontend", "ui"],
-      "flags": { "unestimated": true, "missing_ac": true }
+      "story": "As a customer, I can verify identity with optional voice biometrics, so that sensitive requests are protected.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 8,
+      "labels": ["voice", "security", "auth"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-21T10:40:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-21T10:55:00-07:00", "actor": "sara"}
+      ]
     },
-
     {
-      "key": "THUN-220",
-      "type": "Story",
-      "summary": "Add 'data seeding' pipeline step before e2e",
-      "status": "To Do",
-      "epic_link": "THUN-101",
-      "parent": "THUN-120",
-      "assignee": "priya",
-      "priority": "P1",
+      "id": "TBOT-2901",
+      "type": "Bug",
+      "story": "Defect: Bot occasionally hallucinates order numbers when KB lookup fails.",
+      "sprint": null,
+      "assignee": null,
       "story_points": 3,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [],
-      "labels": ["ci", "pipeline"],
-      "flags": { "missing_ac": true }
+      "labels": ["bug", "nlp", "kb"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-03T15:05:00-08:00", "actor": "support-bot"},
+        {"stage": "Backlog", "ts": "2025-11-03T15:20:00-08:00", "actor": "sara"}
+      ]
     },
     {
-      "key": "THUN-221",
+      "id": "TBOT-2902",
+      "type": "Bug",
+      "story": "Defect: Image attachments >5MB return 500 instead of graceful error.",
+      "sprint": null,
+      "assignee": null,
+      "story_points": 2,
+      "labels": ["bug", "attachments", "api"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-01T09:55:00-07:00", "actor": "qa-bot"},
+        {"stage": "Backlog", "ts": "2025-11-01T10:10:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2101",
       "type": "Story",
-      "summary": "Seed accounts covering trial/paid/enterprise states",
-      "status": "To Do",
-      "epic_link": "THUN-101",
-      "parent": "THUN-120",
+      "story": "As a customer, I can check my order status by order ID, so that I get real-time updates without waiting for an agent.",
+      "sprint": "SPR-34",
+      "assignee": "mike",
+      "story_points": 5,
+      "labels": ["orders", "api", "chatbot"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-27T10:08:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-27T10:30:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:02:00-08:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-11-03T13:15:00-08:00", "actor": "mike"},
+        {"stage": "Blocked", "ts": "2025-11-04T10:47:00-08:00", "actor": "priya", "note": "E2E seed mismatch"},
+        {"stage": "In Development", "ts": "2025-11-04T15:30:00-08:00", "actor": "mike"},
+        {"stage": "Code Review", "ts": "2025-11-05T11:05:00-08:00", "actor": "alex"},
+        {"stage": "In Testing", "ts": "2025-11-05T15:40:00-08:00", "actor": "priya"}
+      ]
+    },
+    {
+      "id": "TBOT-2102",
+      "type": "Story",
+      "story": "As a support manager, I can define escalation thresholds for negative sentiment, so that risky conversations reach humans quickly.",
+      "sprint": "SPR-34",
+      "assignee": "sam",
+      "story_points": 8,
+      "labels": ["sentiment", "routing", "policy"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-28T09:05:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-28T09:25:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:10:00-08:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-11-03T12:45:00-08:00", "actor": "sam"},
+        {"stage": "Code Review", "ts": "2025-11-05T16:05:00-08:00", "actor": "alex"}
+      ]
+    },
+    {
+      "id": "TBOT-2103",
+      "type": "Story",
+      "story": "As a customer, I can receive a translated transcript email after chat, so that I can reference guidance in my language.",
+      "sprint": "SPR-34",
+      "assignee": "jules",
+      "story_points": 5,
+      "labels": ["i18n", "email", "ux"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-29T13:50:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-29T14:10:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:12:00-08:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-11-04T10:02:00-08:00", "actor": "jules"},
+        {"stage": "In Testing", "ts": "2025-11-05T13:15:00-08:00", "actor": "priya"}
+      ]
+    },
+    {
+      "id": "TBOT-2104",
+      "type": "Story",
+      "story": "As a supervisor, I can see bot confidence scores during conversations, so that I can trigger timely agent takeovers.",
+      "sprint": "SPR-34",
+      "assignee": "priya",
+      "story_points": 5,
+      "labels": ["observability", "handoff", "quality"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-30T08:22:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-30T08:40:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:15:00-08:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-11-04T11:00:00-08:00", "actor": "priya"},
+        {"stage": "Code Review", "ts": "2025-11-05T14:40:00-08:00", "actor": "alex"}
+      ]
+    },
+    {
+      "id": "TBOT-2105",
+      "type": "Story",
+      "story": "As a customer, I can update my shipping address during chat, so that deliveries reach the correct location.",
+      "sprint": "SPR-34",
+      "assignee": "mike",
+      "story_points": 8,
+      "labels": ["orders", "address", "tools"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-31T09:40:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-31T10:00:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:18:00-08:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-11-04T09:35:00-08:00", "actor": "mike"}
+      ]
+    },
+    {
+      "id": "TBOT-2106",
+      "type": "Story",
+      "story": "As a support agent, I can generate an RMA label from chat, so that customers can return items without delay.",
+      "sprint": "SPR-34",
+      "assignee": "alex",
+      "story_points": 8,
+      "labels": ["rma", "tools", "logistics"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-27T11:30:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-27T11:45:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:20:00-08:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-11-03T14:22:00-08:00", "actor": "alex"},
+        {"stage": "Blocked", "ts": "2025-11-04T10:10:00-08:00", "actor": "alex", "note": "Carrier API sandbox outage"},
+        {"stage": "In Development", "ts": "2025-11-04T12:05:00-08:00", "actor": "alex"}
+      ]
+    },
+    {
+      "id": "TBOT-2107",
+      "type": "Story",
+      "story": "As a customer, I can start chat from an SMS link and continue on web with context preserved, so that I don’t lose progress.",
+      "sprint": "SPR-34",
       "assignee": "tom",
-      "priority": "P2",
-      "story_points": null,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "Fixture data loads in < 90s",
-        "Docs show how to extend with new plans"
-      ],
-      "labels": ["testing", "fixtures"],
-      "flags": { "unestimated": true }
-    },
-    {
-      "key": "THUN-222",
-      "type": "Spike",
-      "summary": "Investigate test data race conditions",
-      "status": "In Progress",
-      "epic_link": "THUN-101",
-      "parent": "THUN-121",
-      "assignee": "priya",
-      "priority": "P2",
-      "story_points": 3,
-      "sprint": "SPR-34",
-      "timebox_hours": 8,
-      "exit_criteria": [
-        "Document root cause hypotheses",
-        "Proposed mitigation plan with estimated effort"
-      ],
-      "labels": ["e2e", "investigation"]
-    },
-    {
-      "key": "THUN-230",
-      "type": "Bug",
-      "summary": "TEST-472 'Renewal flow' flaky — quarantine & fix",
-      "status": "In Progress",
-      "epic_link": "THUN-101",
-      "parent": "THUN-121",
-      "assignee": "priya",
-      "priority": "P1",
-      "story_points": null,
-      "sprint": "SPR-34",
-      "repro_steps": "Intermittent failure in step 2/4; timing dependent",
-      "labels": ["flaky-test", "e2e"],
-      "flags": { "unestimated": true }
-    },
-    {
-      "key": "THUN-231",
-      "type": "Task",
-      "summary": "Tune alert thresholds to reduce false 5XX pages",
-      "status": "To Do",
-      "epic_link": "THUN-101",
-      "parent": "THUN-121",
-      "assignee": "diego",
-      "priority": "P2",
-      "story_points": 3,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "No false positives on nightly batch",
-        "Alert fires when 5XX > baseline + 3σ for 5 min"
-      ],
-      "labels": ["sre", "observability"]
-    },
-
-    {
-      "key": "THUN-240",
-      "type": "Story",
-      "summary": "CSV export endpoint /v1/billing/export",
-      "status": "Backlog",
-      "epic_link": "THUN-102",
-      "parent": "THUN-130",
-      "assignee": "alex",
-      "priority": "P3",
-      "story_points": 13,
-      "sprint": null,
-      "acceptance_criteria": [],
-      "labels": ["backend", "billing"],
-      "flags": { "missing_ac": true }
-    },
-    {
-      "key": "THUN-241",
-      "type": "Story",
-      "summary": "Export UI: download button & status",
-      "status": "Backlog",
-      "epic_link": "THUN-102",
-      "parent": "THUN-130",
-      "assignee": null,
-      "priority": "P3",
-      "story_points": null,
-      "sprint": null,
-      "acceptance_criteria": [],
-      "labels": ["frontend", "billing"],
-      "flags": { "unassigned": true, "unestimated": true, "missing_ac": true }
-    },
-
-    // --- Orphans (no epic/parent) ---
-
-    {
-      "key": "THUN-300",
-      "type": "Story",
-      "summary": "Per-user overage cap enforcement (hard cap)",
-      "status": "In Progress",
-      "epic_link": null,
-      "parent": null,
-      "assignee": "mike",
-      "priority": "P2",
-      "story_points": 8,
-      "sprint": "SPR-35",
-      "acceptance_criteria": [
-        "Requests beyond cap return 429 with retry-after",
-        "Configurable per plan",
-        "Observability: capped count per user"
-      ],
-      "labels": ["backend", "limits"],
-      "flags": { "orphan": true },
-      "notes": "Likely belongs under THUN-100"
-    },
-    {
-      "key": "THUN-301",
-      "type": "Story",
-      "summary": "GDPR audit for `usage_events` retention",
-      "status": "To Do",
-      "epic_link": null,
-      "parent": null,
-      "assignee": "sam",
-      "priority": "P3",
-      "story_points": 3,
-      "sprint": null,
-      "acceptance_criteria": [
-        "Retention policy documented & approved by Legal",
-        "PII review completed; purge job defined if needed"
-      ],
-      "labels": ["compliance", "data"],
-      "flags": { "orphan": true }
-    },
-    {
-      "key": "THUN-302",
-      "type": "Bug",
-      "summary": "Staging JWT issuer mismatch leads to `jwt malformed`",
-      "status": "Done",
-      "epic_link": null,
-      "parent": null,
-      "assignee": "alex",
-      "priority": "P2",
-      "story_points": 1,
-      "sprint": "SPR-34",
-      "repro_steps": "Set JWT_ISS incorrectly on staging; rotate token",
-      "labels": ["auth", "staging"],
-      "flags": { "orphan": true }
-    },
-
-    // --- Process / Wellness ---
-
-    {
-      "key": "THUN-303",
-      "type": "Story",
-      "summary": "Publish acceptance-criteria template",
-      "status": "To Do",
-      "epic_link": null,
-      "parent": null,
-      "assignee": null,
-      "priority": "P2",
-      "story_points": 2,
-      "sprint": "SPR-35",
-      "acceptance_criteria": [],
-      "labels": ["process", "documentation"],
-      "flags": { "orphan": true, "unassigned": true, "missing_ac": true }
-    },
-    {
-      "key": "THUN-304",
-      "type": "Task",
-      "summary": "On-call rotation policy update in PagerDuty",
-      "status": "To Do",
-      "epic_link": "THUN-103",
-      "parent": null,
-      "assignee": "sara",
-      "priority": "P2",
-      "story_points": 1,
-      "sprint": "SPR-35",
-      "acceptance_criteria": [
-        "Backup assignee documented for each rotation",
-        "Swap procedure documented & communicated"
-      ],
-      "labels": ["process", "pagerduty"]
-    },
-    {
-      "key": "THUN-308",
-      "type": "Story",
-      "summary": "Automate merge freeze after 7 PM local time",
-      "status": "To Do",
-      "epic_link": "THUN-103",
-      "parent": null,
-      "assignee": "diego",
-      "priority": "P2",
-      "story_points": 3,
-      "sprint": "SPR-35",
-      "acceptance_criteria": [
-        "PR merges blocked after 19:00–07:00 except for approved label",
-        "Audit log of override events",
-        "Docs updated for emergency procedure"
-      ],
-      "labels": ["devex", "policy"]
-    },
-    {
-      "key": "THUN-309",
-      "type": "Story",
-      "summary": "Automate nightly merge freeze (duplicate of THUN-308)",
-      "status": "Duplicate",
-      "epic_link": "THUN-103",
-      "parent": null,
-      "assignee": null,
-      "priority": "P3",
-      "story_points": null,
-      "sprint": null,
-      "acceptance_criteria": [],
-      "labels": ["duplicate"],
-      "duplicate_of": "THUN-308",
-      "flags": { "duplicate": true, "unestimated": true, "unassigned": true }
-    },
-
-    // --- More stories for coverage ---
-
-    {
-      "key": "THUN-306",
-      "type": "Story",
-      "summary": "Contract tests for /v2/limits",
-      "status": "In Progress",
-      "epic_link": "THUN-100",
-      "parent": "THUN-110",
-      "assignee": "priya",
-      "priority": "P1",
       "story_points": 5,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "Consumer-provider contract in CI",
-        "Breaking changes fail pipeline",
-        "Docs for adding new contracts"
-      ],
-      "labels": ["testing", "contracts"]
+      "labels": ["sessions", "handoff", "sms"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-28T15:05:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-28T15:30:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:22:00-08:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-11-04T13:10:00-08:00", "actor": "tom"}
+      ]
     },
     {
-      "key": "THUN-305",
+      "id": "TBOT-2108",
       "type": "Story",
-      "summary": "Accessibility: tooltip fixes & focus order",
-      "status": "Done",
-      "epic_link": "THUN-100",
-      "parent": "THUN-111",
+      "story": "As a customer, I can log in with a magic link email, so that I avoid passwords during support chats.",
+      "sprint": "SPR-34",
       "assignee": "jules",
-      "priority": "P3",
-      "story_points": 2,
-      "sprint": "SPR-34",
-      "acceptance_criteria": [
-        "Tooltips accessible via keyboard & screen readers",
-        "No focus traps reported by axe"
-      ],
-      "labels": ["frontend", "a11y"]
-    },
-    {
-      "key": "THUN-310",
-      "type": "Story",
-      "summary": "Doc: How to write contract tests",
-      "status": "To Do",
-      "epic_link": null,
-      "parent": null,
-      "assignee": "priya",
-      "priority": "P3",
-      "story_points": null,
-      "sprint": "SPR-35",
-      "acceptance_criteria": [
-        "Step-by-step guide added to /docs/testing/contract-tests.md",
-        "Example test linked from repo"
-      ],
-      "labels": ["documentation", "testing"],
-      "flags": { "orphan": true, "unestimated": true }
-    },
-    {
-      "key": "THUN-311",
-      "type": "Task",
-      "summary": "Create slow query log dashboard for staging",
-      "status": "To Do",
-      "epic_link": "THUN-101",
-      "parent": "THUN-121",
-      "assignee": "diego",
-      "priority": "P3",
-      "story_points": 2,
-      "sprint": "SPR-35",
-      "acceptance_criteria": [
-        "Dashboard shows top 10 slow queries by p95",
-        "Alert when p95 > 500ms for 10 min"
-      ],
-      "labels": ["observability", "staging"]
-    },
-    {
-      "key": "THUN-312",
-      "type": "Story",
-      "summary": "Trial user behavior for Usage Limits",
-      "status": "To Do",
-      "epic_link": "THUN-100",
-      "parent": "THUN-111",
-      "assignee": "sam",
-      "priority": "P2",
       "story_points": 3,
-      "sprint": "SPR-35",
-      "acceptance_criteria": [],
-      "labels": ["product"],
-      "flags": { "missing_ac": true }
+      "labels": ["auth", "email", "onboarding"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-29T10:12:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-29T10:35:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-03T09:25:00-08:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-11-04T12:40:00-08:00", "actor": "jules"}
+      ]
+    },
+    {
+      "id": "TBOT-2903",
+      "type": "Bug",
+      "story": "Defect: Duplicate refunds triggered when a user re-submits within 5 seconds.",
+      "sprint": "SPR-34",
+      "assignee": "alex",
+      "story_points": 3,
+      "labels": ["bug", "refunds", "idempotency"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-11-04T08:41:00-08:00", "actor": "support-bot"},
+        {"stage": "Backlog", "ts": "2025-11-04T08:50:00-08:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-11-04T09:00:00-08:00", "actor": "alex"},
+        {"stage": "In Development", "ts": "2025-11-04T09:15:00-08:00", "actor": "alex"}
+      ]
+    },
+    {
+      "id": "TBOT-2201",
+      "type": "Story",
+      "story": "As a customer, I can initiate chat from the website widget, so that I can get help without leaving the page.",
+      "sprint": "SPR-31",
+      "assignee": "jules",
+      "story_points": 5,
+      "labels": ["widget", "frontend", "chatbot"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-09-10T10:05:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-09-12T09:10:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-09-22T09:00:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-09-22T13:20:00-07:00", "actor": "jules"},
+        {"stage": "Code Review", "ts": "2025-09-24T11:05:00-07:00", "actor": "alex"},
+        {"stage": "In Testing", "ts": "2025-09-25T09:15:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-09-29T10:30:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-09-29T12:05:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-09-30T09:10:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2202",
+      "type": "Story",
+      "story": "As a support manager, I can view chat transcripts in our CRM, so that agents have full context.",
+      "sprint": "SPR-31",
+      "assignee": "alex",
+      "story_points": 8,
+      "labels": ["crm", "integration", "transcripts"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-09-11T14:20:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-09-13T10:00:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-09-22T09:05:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-09-23T10:40:00-07:00", "actor": "alex"},
+        {"stage": "Code Review", "ts": "2025-09-26T13:15:00-07:00", "actor": "mike"},
+        {"stage": "In Testing", "ts": "2025-09-27T09:25:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-09-30T09:40:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-09-30T10:05:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-01T09:00:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2203",
+      "type": "Story",
+      "story": "As a customer, I can verify identity with last-4 digits and postcode, so that sensitive actions are protected.",
+      "sprint": "SPR-31",
+      "assignee": "mike",
+      "story_points": 5,
+      "labels": ["auth", "kba", "security"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-09-08T11:35:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-09-12T11:55:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-09-22T09:08:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-09-23T13:05:00-07:00", "actor": "mike"},
+        {"stage": "Code Review", "ts": "2025-09-25T16:05:00-07:00", "actor": "alex"},
+        {"stage": "In Testing", "ts": "2025-09-26T10:10:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-09-29T15:05:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-09-29T15:40:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-09-30T11:15:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2204",
+      "type": "Story",
+      "story": "As a security officer, I can view an audit log of bot tool calls, so that I can investigate misuse.",
+      "sprint": "SPR-31",
+      "assignee": "diego",
+      "story_points": 3,
+      "labels": ["audit", "security", "observability"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-09-09T09:12:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-09-12T09:30:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-09-22T09:12:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-09-24T09:40:00-07:00", "actor": "diego"},
+        {"stage": "In Testing", "ts": "2025-09-25T14:05:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-09-28T11:30:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-09-28T12:05:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-09-28T12:20:00-07:00", "actor": "sara"}
+      ]
+    },
+
+    {
+      "id": "TBOT-2205",
+      "type": "Story",
+      "story": "As a customer, I can receive an email transcript after chat, so that I can refer back to the steps.",
+      "sprint": "SPR-32",
+      "assignee": "jules",
+      "story_points": 5,
+      "labels": ["email", "transcripts", "ux"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-09-30T14:18:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-02T09:00:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-06T09:02:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-06T13:30:00-07:00", "actor": "jules"},
+        {"stage": "Code Review", "ts": "2025-10-08T11:10:00-07:00", "actor": "alex"},
+        {"stage": "In Testing", "ts": "2025-10-09T10:05:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-12T09:35:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-12T10:10:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-12T10:30:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2206",
+      "type": "Story",
+      "story": "As a support manager, I can configure business hours, so that the bot changes behavior out of hours.",
+      "sprint": "SPR-32",
+      "assignee": "sam",
+      "story_points": 3,
+      "labels": ["policy", "business-hours", "routing"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-01T09:40:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-02T10:05:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-06T09:05:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-07T10:22:00-07:00", "actor": "sam"},
+        {"stage": "In Testing", "ts": "2025-10-08T15:05:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-09T09:35:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-09T10:05:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-09T10:20:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2207",
+      "type": "Story",
+      "story": "As a customer, I can retrieve an order using email and postcode, so that I can get help without logging in.",
+      "sprint": "SPR-32",
+      "assignee": "mike",
+      "story_points": 8,
+      "labels": ["orders", "lookup", "api"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-09-29T12:18:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-01T09:00:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-06T09:07:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-06T14:10:00-07:00", "actor": "mike"},
+        {"stage": "Code Review", "ts": "2025-10-08T16:35:00-07:00", "actor": "alex"},
+        {"stage": "In Testing", "ts": "2025-10-09T11:05:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-13T09:45:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-13T10:20:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-13T10:45:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2208",
+      "type": "Story",
+      "story": "As a knowledge manager, I can bulk import KB articles, so that the bot answers from the latest content.",
+      "sprint": "SPR-32",
+      "assignee": "priya",
+      "story_points": 5,
+      "labels": ["kb", "sync", "cms"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-09-28T09:35:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-01T10:05:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-06T09:12:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-07T11:35:00-07:00", "actor": "priya"},
+        {"stage": "In Testing", "ts": "2025-10-08T16:10:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-10T09:35:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-10T10:10:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-10T10:30:00-07:00", "actor": "sara"}
+      ]
+    },
+
+    {
+      "id": "TBOT-2209",
+      "type": "Story",
+      "story": "As a customer, I can get return policy answers sourced from the KB, so that I understand options without waiting.",
+      "sprint": "SPR-33",
+      "assignee": "jules",
+      "story_points": 3,
+      "labels": ["kb", "nlp", "ux"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-10T11:22:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-16T10:05:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-20T09:02:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-21T10:30:00-07:00", "actor": "jules"},
+        {"stage": "Code Review", "ts": "2025-10-22T11:05:00-07:00", "actor": "alex"},
+        {"stage": "In Testing", "ts": "2025-10-22T14:35:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-23T10:40:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-23T11:05:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-23T11:20:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2210",
+      "type": "Story",
+      "story": "As a support manager, I can see a deflection metrics dashboard, so that I can track FCR improvements.",
+      "sprint": "SPR-33",
+      "assignee": "alex",
+      "story_points": 8,
+      "labels": ["analytics", "dashboard", "fcr"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-12T10:05:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-16T10:20:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-20T09:05:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-20T14:22:00-07:00", "actor": "alex"},
+        {"stage": "Code Review", "ts": "2025-10-22T16:05:00-07:00", "actor": "mike"},
+        {"stage": "In Testing", "ts": "2025-10-23T11:05:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-24T10:40:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-24T11:05:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-24T11:20:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2211",
+      "type": "Story",
+      "story": "As a customer, I can receive rich messages (images, links) in chat, so that support steps are clearer.",
+      "sprint": "SPR-33",
+      "assignee": "jules",
+      "story_points": 5,
+      "labels": ["rich-messages", "frontend", "ux"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-11T15:05:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-16T10:25:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-20T09:12:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-21T11:20:00-07:00", "actor": "jules"},
+        {"stage": "In Testing", "ts": "2025-10-22T13:15:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-23T16:40:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-23T17:05:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-24T09:00:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2212",
+      "type": "Story",
+      "story": "As an operations analyst, I can view daily first-contact resolution rate, so that I can assess bot impact.",
+      "sprint": "SPR-33",
+      "assignee": "diego",
+      "story_points": 3,
+      "labels": ["analytics", "metrics", "dashboard"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-13T10:10:00-07:00", "actor": "sam"},
+        {"stage": "Backlog", "ts": "2025-10-16T10:30:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-20T09:18:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-22T09:40:00-07:00", "actor": "diego"},
+        {"stage": "In Testing", "ts": "2025-10-23T11:05:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-23T16:40:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-23T17:05:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-24T09:00:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2910",
+      "type": "Bug",
+      "story": "Defect: SLA timer displayed wrong timezone for EU customers.",
+      "sprint": "SPR-32",
+      "assignee": "priya",
+      "story_points": 2,
+      "labels": ["bug", "timezone", "sla"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-07T08:31:00-07:00", "actor": "support-bot"},
+        {"stage": "Backlog", "ts": "2025-10-07T08:45:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-08T09:00:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-08T11:15:00-07:00", "actor": "priya"},
+        {"stage": "In Testing", "ts": "2025-10-08T15:31:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-09T09:20:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-09T09:50:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-09T10:05:00-07:00", "actor": "sara"}
+      ]
+    },
+    {
+      "id": "TBOT-2911",
+      "type": "Bug",
+      "story": "Defect: Live agent request button failed on Safari 16.",
+      "sprint": "SPR-33",
+      "assignee": "jules",
+      "story_points": 3,
+      "labels": ["bug", "frontend", "handoff"],
+      "release_tag": "2025.11.14",
+      "stage_history": [
+        {"stage": "Created", "ts": "2025-10-20T13:31:00-07:00", "actor": "support-bot"},
+        {"stage": "Backlog", "ts": "2025-10-20T13:45:00-07:00", "actor": "sara"},
+        {"stage": "Ready for Dev", "ts": "2025-10-21T09:00:00-07:00", "actor": "sara"},
+        {"stage": "In Development", "ts": "2025-10-21T11:18:00-07:00", "actor": "jules"},
+        {"stage": "In Testing", "ts": "2025-10-21T15:05:00-07:00", "actor": "priya"},
+        {"stage": "Ready for Deploy", "ts": "2025-10-22T09:20:00-07:00", "actor": "diego"},
+        {"stage": "Deployed", "ts": "2025-10-22T09:45:00-07:00", "actor": "diego"},
+        {"stage": "Done", "ts": "2025-10-22T10:05:00-07:00", "actor": "sara"}
+      ]
     }
   ]
 }
